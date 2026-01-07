@@ -12,6 +12,7 @@ transpile_web_ui("resources") {
       ] ]
   resource_name = "brave_welcome_page"
   imports_from = [ "//brave/browser/resources/brave_welcome_page/" ]
+  deps = [ "//brave/components/resources:strings" ]
 }
 
 pack_web_resources("generated_resources") {
