@@ -5,37 +5,38 @@
 
 import fs from 'fs-extra'
 import path from 'node:path'
+import { vi } from 'vitest'
 import ActionGuard from './actionGuard.js'
 
 describe('ActionGuard', () => {
   const guardFilePath = '/path/to/guard/file'
-  const cleanupClosure = jest.fn()
+  const cleanupClosure = vi.fn()
   let files = {}
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     files = {}
 
-    fs.existsSync = jest.fn((filePath) => {
+    fs.existsSync = vi.fn((filePath) => {
       return files.hasOwnProperty(filePath)
     })
 
-    fs.readFileSync = jest.fn((filePath) => {
+    fs.readFileSync = vi.fn((filePath) => {
       if (!files.hasOwnProperty(filePath)) {
         throw new Error(`ENOENT: no such file or directory, open '${filePath}'`)
       }
       return files[filePath]
     })
 
-    fs.writeFileSync = jest.fn((filePath, data) => {
+    fs.writeFileSync = vi.fn((filePath, data) => {
       files[filePath] = data
     })
 
-    fs.unlinkSync = jest.fn((filePath) => {
+    fs.unlinkSync = vi.fn((filePath) => {
       delete files[filePath]
     })
 
-    fs.ensureDirSync = jest.fn()
+    fs.ensureDirSync = vi.fn()
   })
 
   it('should simulate fs operations correctly', () => {
@@ -149,7 +150,7 @@ describe('ActionGuard', () => {
 
   describe('run', () => {
     it('should perform the action with a guard', () => {
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath, cleanupClosure)
       actionGuard.run(actionClosure)
       expect(fs.ensureDirSync).toHaveBeenCalledWith(path.dirname(guardFilePath))
@@ -162,7 +163,7 @@ describe('ActionGuard', () => {
     })
 
     it('should allow another run after the action is completed', () => {
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath, cleanupClosure)
       actionGuard.run(actionClosure)
       expect(actionClosure).toHaveBeenCalledWith(false)
@@ -172,7 +173,7 @@ describe('ActionGuard', () => {
     })
 
     it('should throw an error if called while running', () => {
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath)
       expect(() => {
         actionGuard.run(() => {
@@ -195,7 +196,7 @@ describe('ActionGuard', () => {
       expect(cleanupClosure).not.toHaveBeenCalled()
       expect(actionGuard.wasInterrupted()).toBe(true)
 
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       actionGuard.run(actionClosure)
       expect(cleanupClosure).toHaveBeenCalled()
       expect(actionClosure).toHaveBeenCalledWith(true)
@@ -213,7 +214,7 @@ describe('ActionGuard', () => {
 
   describe('runWithCleanupClosure', () => {
     it('should perform the action if the guard file does not exist', () => {
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath, cleanupClosure)
       actionGuard.run(actionClosure)
       expect(fs.existsSync).toHaveBeenCalledWith(guardFilePath)
@@ -228,7 +229,7 @@ describe('ActionGuard', () => {
 
     it('should perform the cleanup and then perform the action if the guard file exists', () => {
       fs.writeFileSync(guardFilePath, '')
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath, cleanupClosure)
       actionGuard.run(actionClosure)
       expect(fs.existsSync).toHaveBeenCalledWith(guardFilePath)
@@ -243,7 +244,7 @@ describe('ActionGuard', () => {
 
     it('should throw an error if the cleanup removes the guard file', () => {
       fs.writeFileSync(guardFilePath, '')
-      const actionClosure = jest.fn()
+      const actionClosure = vi.fn()
       const actionGuard = new ActionGuard(guardFilePath, () => {
         fs.unlinkSync(guardFilePath)
       })

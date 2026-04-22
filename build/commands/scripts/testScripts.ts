@@ -8,12 +8,26 @@ import { spawnSync } from 'node:child_process'
 // Run the TypeScript compiler.
 run('tsc', ['--project', 'build/commands'])
 
-// Run the ESLint linter. This is required to catch possible runtime errors
-// that might occur because of broken imports.
-run('eslint', ['--quiet', 'build/commands'])
+// Check formatting for changed command scripts.
+const changedCommandFiles = getChangedFiles().filter((file) => {
+  return (
+    file.startsWith('build/commands/') &&
+    /\.(js|jsx|ts|tsx|mjs|mts|json|jsonc)$/.test(file)
+  )
+})
+if (changedCommandFiles.length > 0) {
+  run('oxfmt', [
+    '--check',
+    '--config',
+    '.oxfmtrc.json',
+    '--ignore-path',
+    '.prettierignore',
+    ...changedCommandFiles,
+  ])
+}
 
-// Run the Jest test runner. Pass through any extra arguments to it.
-run('jest', ['build/commands', ...process.argv.slice(2)])
+// Run the Vitest test runner. Pass through any extra arguments to it.
+run('vitest', ['run', 'build/commands', ...process.argv.slice(2)])
 
 // Run a command and exit on error.
 function run(cmd: string, args: string[]): void {
@@ -26,4 +40,17 @@ function run(cmd: string, args: string[]): void {
   if (result.status !== 0) {
     process.exit(result.status ?? 1)
   }
+}
+
+function getChangedFiles(): string[] {
+  const result = spawnSync(
+    'git',
+    ['diff', '--name-only', '--diff-filter=ACMRTUXB', 'upstream/master'],
+    { encoding: 'utf-8' },
+  )
+  if (result.status !== 0) {
+    process.stderr.write(result.stderr)
+    process.exit(result.status ?? 1)
+  }
+  return result.stdout.split(/\r?\n/).filter(Boolean)
 }

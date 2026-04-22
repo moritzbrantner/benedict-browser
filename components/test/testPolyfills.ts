@@ -4,8 +4,9 @@
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import { getMockChrome, getMockLoadTimeData } from './testData'
+import { vi } from 'vitest'
 
-window.alert = jest.fn()
+window.alert = vi.fn()
 
 global.decodeURIComponent = () => 'test'
 

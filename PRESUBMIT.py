@@ -149,31 +149,23 @@ def CheckPatchFormatted(input_api, output_api):
         return [
             output_api.PresubmitError(
                 f'The code requires formatting. '
-                f'Please run: npm run presubmit -- --fix.\n\n{err}')
+                f'Please run: bun run presubmit -- --fix.\n\n{err}')
         ]
 
 
-# Check and fix ESLint issues (supports --fix).
-def CheckESLint(input_api, output_api):
-    if input_api.PRESUBMIT_ALL_BRAVE:
-        cmd = [
-            brave_chromium_utils.wspath(
-                '//brave/node_modules/eslint/bin/eslint.js'),
-            '--quiet',
-            '.',
-        ]
-        if input_api.PRESUBMIT_FIX:
-            cmd.append('--fix')
-        try:
-            brave_node.RunNode(cmd, include_command_in_error=False)
-            return []
-        except RuntimeError as err:
-            return [
-                output_api.PresubmitError(
-                    f'ESLint issues found. '
-                    f'Run npm run eslint -- (--fix) to reproduce.\n\n{err}')
-            ]
-
+# Check JavaScript and TypeScript formatting through oxfmt (supports --fix).
+def CheckOxfmt(input_api, output_api):
+    cmd = [
+        brave_chromium_utils.wspath('//brave/node_modules/oxfmt/bin/oxfmt'),
+        '--config',
+        brave_chromium_utils.wspath('//brave/.oxfmtrc.json'),
+        '--ignore-path',
+        brave_chromium_utils.wspath('//brave/.prettierignore'),
+    ]
+    if input_api.PRESUBMIT_FIX:
+        cmd.append('--write')
+    else:
+        cmd.append('--check')
 
     files_to_check = (
         r'.+\.js$',
@@ -186,19 +178,30 @@ def CheckESLint(input_api, output_api):
 
     file_filter = lambda f: input_api.FilterSourceFile(
         f, files_to_check=files_to_check, files_to_skip=files_to_skip)
-    files_to_check = input_api.AffectedFiles(file_filter=file_filter,
-                                             include_deletes=False)
+    files_to_check = [
+        f.LocalPath()
+        for f in input_api.AffectedFiles(file_filter=file_filter,
+                                         include_deletes=False)
+    ]
+    if not files_to_check:
+        return []
 
-    with brave_chromium_utils.sys_path('//tools'):
-        from web_dev_style import js_checker
-        return js_checker.JSChecker(input_api,
-                                    output_api).RunEsLintChecks(files_to_check)
+    cmd.extend(files_to_check)
+    try:
+        brave_node.RunNode(cmd, include_command_in_error=False)
+        return []
+    except RuntimeError as err:
+        return [
+            output_api.PresubmitError(
+                f'Oxfmt issues found. '
+                f'Run bun run lint to reproduce.\n\n{err}')
+        ]
 
 
 def CheckWebDevStyle(input_api, output_api):
     with brave_chromium_utils.sys_path('//tools'):
         from web_dev_style import presubmit_support, js_checker
-        # Disable RunEsLintChecks, it's run separately in CheckESLint.
+        # Disable upstream JS style checks; oxfmt runs separately in CheckOxfmt.
         with override_utils.override_scope_function(
                 js_checker.JSChecker,
                 chromium_presubmit_overrides.noop_check,

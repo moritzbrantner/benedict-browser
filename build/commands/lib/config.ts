@@ -25,7 +25,12 @@ type ExecOptions = {
 const validTargetOSValues = ['android', 'ios', 'linux', 'mac', 'win'] as const
 type TargetOS = (typeof validTargetOSValues)[number]
 
-const braveCoreDir = path.join(rootDir, 'src', 'brave')
+const braveCoreDirCandidate = path.join(rootDir, 'src', 'brave')
+const braveCoreDir = fs.existsSync(
+  path.join(braveCoreDirCandidate, 'package.json'),
+)
+  ? braveCoreDirCandidate
+  : rootDir
 
 const envConfig = new EnvConfig(braveCoreDir)
 
@@ -168,8 +173,8 @@ export class Config {
     this.targetEnvironment = envConfig.getString(['target_environment'])
     this.gypTargetArch = 'x64'
     this.ignorePatchVersionNumber =
-      !this.isBraveReleaseBuild()
-      && envConfig.getBoolean(['ignore_patch_version_number'], !isCI)
+      !this.isBraveReleaseBuild() &&
+      envConfig.getBoolean(['ignore_patch_version_number'], !isCI)
     this.useDummyLastchange = envConfig.getBoolean(
       ['use_dummy_lastchange'],
       true,
@@ -312,12 +317,12 @@ export class Config {
 
   enableCDMHostVerification() {
     const enable =
-      this.buildConfig === 'Release'
-      && process.platform !== 'linux'
-      && this.sign_widevine_cert !== ''
-      && this.sign_widevine_key !== ''
-      && this.sign_widevine_passwd !== ''
-      && fs.existsSync(this.signature_generator)
+      this.buildConfig === 'Release' &&
+      process.platform !== 'linux' &&
+      this.sign_widevine_cert !== '' &&
+      this.sign_widevine_key !== '' &&
+      this.sign_widevine_passwd !== '' &&
+      fs.existsSync(this.signature_generator)
     if (enable) {
       console.log('Widevine cdm host verification is enabled')
     } else {
@@ -362,9 +367,9 @@ export class Config {
 
   shouldSign() {
     if (
-      this.skip_signing
-      || this.isComponentBuild()
-      || this.targetOS === 'ios'
+      this.skip_signing ||
+      this.isComponentBuild() ||
+      this.targetOS === 'ios'
     ) {
       return false
     }
@@ -379,9 +384,9 @@ export class Config {
 
     if (process.platform === 'win32') {
       return (
-        process.env.CERT !== undefined
-        || process.env.AUTHENTICODE_HASH !== undefined
-        || process.env.SIGNTOOL_ARGS !== undefined
+        process.env.CERT !== undefined ||
+        process.env.AUTHENTICODE_HASH !== undefined ||
+        process.env.SIGNTOOL_ARGS !== undefined
       )
     }
 
@@ -415,9 +420,9 @@ export class Config {
 
   getProjectVersion(projectName) {
     return (
-      envConfig.getString(['projects', projectName, 'revision'])
-      || envConfig.getString(['projects', projectName, 'tag'])
-      || envConfig.getString(['projects', projectName, 'branch'])
+      envConfig.getString(['projects', projectName, 'revision']) ||
+      envConfig.getString(['projects', projectName, 'tag']) ||
+      envConfig.getString(['projects', projectName, 'branch'])
     )
   }
 
@@ -649,8 +654,8 @@ export class Config {
   fromGnArgs(options) {
     const gnArgs = readArgsGn(this.srcDir, options.C)
     Log.warn(
-      '--no-gn-gen is experimental and only gn args that match command '
-        + 'line options will be processed',
+      '--no-gn-gen is experimental and only gn args that match command ' +
+        'line options will be processed',
     )
     this.updateInternal(Object.assign({}, gnArgs, options))
     assert(!isCI)
@@ -899,9 +904,9 @@ export class Config {
       buildConfigDir = this.targetOS + '_' + buildConfigDir
     }
     if (
-      this.targetOS === 'ios'
-      && this.targetEnvironment
-      && this.targetEnvironment !== 'device'
+      this.targetOS === 'ios' &&
+      this.targetEnvironment &&
+      this.targetEnvironment !== 'device'
     ) {
       buildConfigDir = buildConfigDir + '_' + this.targetEnvironment
     }

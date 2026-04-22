@@ -8,20 +8,16 @@ import fs from 'fs-extra'
 import program from 'commander'
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
 
-// prettier does not provide a default export in .d.ts file.
-// eslint-disable-next-line import/default
-import prettier from 'prettier'
-
 import config from '../lib/config.ts'
 import util from '../lib/util.js'
 import * as Log from '../lib/log.ts'
 
 program
   .description(
-    'Format changed code with git cl format and prettier.\n'
-      + 'The changed code is the difference between the current files on disk\n'
-      + 'and the base branch (origin/master by default).\n'
-      + 'This script is also called as part of presubmit checks.',
+    'Format changed code with git cl format and oxfmt.\n' +
+      'The changed code is the difference between the current files on disk\n' +
+      'and the base branch (origin/master by default).\n' +
+      'This script is also called as part of presubmit checks.',
   )
   .option('--base <base branch>', 'set the destination branch for the PR')
   .option(
@@ -30,21 +26,19 @@ program
   )
   .option(
     '--presubmit',
-    'filter out formatters that have dedicated presubmit checks.'
-      + 'Used when running the script from a presubmit',
+    'filter out formatters that have dedicated presubmit checks.' +
+      'Used when running the script from a presubmit',
   )
   .option(
     '--dry-run',
     "dry run, don't format files, just check if they are formatted",
   )
-  .option(
-    '--only-prettier',
-    'only run prettier, ignore the rest of the formatters.',
-  )
+  .option('--only-oxfmt', 'only run oxfmt, ignore the rest of the formatters.')
+  .option('--only-prettier', 'deprecated alias for --only-oxfmt.')
   .option(
     '--all-files',
-    'format all files, not just the changed files.'
-      + 'Only for prettier and mojom formatters.',
+    'format all files, not just the changed files.' +
+      'Only for oxfmt and mojom formatters.',
   )
   .action(runFormat)
 
@@ -56,8 +50,8 @@ const convertDiff = (diffOutput: string, file: string) => {
     pos = diffOutput.indexOf('\n', pos + 1)
   }
   const diffOutputWithHeader =
-    `--- ${file} (original)\n+++ ${file} (reformatted)\n`
-    + diffOutput.slice(pos + 1)
+    `--- ${file} (original)\n+++ ${file} (reformatted)\n` +
+    diffOutput.slice(pos + 1)
   return diffOutputWithHeader
 }
 
@@ -72,19 +66,23 @@ const getAllFiles = () => {
     .split('\n')
 }
 
-const formatOutput = (result: SpawnSyncReturns<NonSharedBuffer>) => {
+const formatOutput = (result: {
+  stdout: Buffer | string
+  stderr: Buffer | string
+}) => {
   return [result.stdout, result.stderr]
     .filter((v) => v.length)
     .join('\nstderr:\n')
 }
 
 // A function that formats the code in the current diff with base branch.
-// It uses git cl format and prettier, then aggregates the results.
+// It uses git cl format and oxfmt, then aggregates the results.
 async function runFormat(options: {
   base?: string
   full?: boolean
   presubmit?: boolean
   dryRun?: boolean
+  onlyOxfmt?: boolean
   onlyPrettier?: boolean
   allFiles?: boolean
 }) {
@@ -116,9 +114,10 @@ async function runFormat(options: {
 
   const formatIssues: string[] = []
 
-  const shouldRunGitClFormat = !options.onlyPrettier
-  const shouldRunPrettier = true
-  const shouldRunMojomFormat = !options.onlyPrettier
+  const onlyOxfmt = options.onlyOxfmt || options.onlyPrettier
+  const shouldRunGitClFormat = !onlyOxfmt
+  const shouldRunOxfmt = true
+  const shouldRunMojomFormat = !onlyOxfmt
 
   if (shouldRunGitClFormat) {
     const clFormatResult = util.run('git', [...args], {
@@ -142,9 +141,9 @@ async function runFormat(options: {
     ? getAllFiles()
     : util.getChangedFiles(config.braveCoreDir, options.base, skipLogging)
 
-  if (shouldRunPrettier) {
+  if (shouldRunOxfmt) {
     formatIssues.push(
-      ...(await runPrettier(filesToFormat, options.dryRun ?? false)),
+      ...(await runOxfmt(filesToFormat, options.dryRun ?? false)),
     )
   }
   if (shouldRunMojomFormat) {
@@ -182,57 +181,102 @@ const handleDifference = async (
   }
 }
 
-const runPrettierForFile = async (
+const runOxfmtCommand = (args: string[]): SpawnSyncReturns<Buffer> => {
+  return spawnSync('oxfmt', args, {
+    cwd: config.braveCoreDir,
+    stdio: 'pipe',
+  })
+}
+
+const runOxfmtForFile = async (
   file: string,
   dryRun: boolean,
-  ignorePath: string,
 ): Promise<string | undefined> => {
-  const fileInfo = await prettier.getFileInfo(file, {
-    ignorePath,
-    withNodeModules: false,
-  })
-
-  if (fileInfo.ignored || !fileInfo.inferredParser) {
+  if (!file) {
     return undefined
   }
 
-  const options = await prettier.resolveConfig(file)
-  const content = await fs.readFile(file, { encoding: 'utf-8' })
-  const formatted = await prettier.format(content, {
-    ...options,
-    filepath: file,
-    parser: fileInfo.inferredParser,
+  const oxfmtConfigPath = path.join(config.braveCoreDir, '.oxfmtrc.json')
+  const ignorePath = path.join(config.braveCoreDir, '.prettierignore')
+  const baseArgs = [
+    '--config',
+    oxfmtConfigPath,
+    '--ignore-path',
+    ignorePath,
+    '--no-error-on-unmatched-pattern',
+  ]
+
+  if (!dryRun) {
+    const formatResult = runOxfmtCommand([...baseArgs, '--write', file])
+    if (formatResult.status === 0) {
+      return undefined
+    }
+    return `Can't format ${file}:\n ${formatOutput(formatResult)}`
+  }
+
+  const checkResult = runOxfmtCommand([...baseArgs, '--list-different', file])
+  if (checkResult.status === 0) {
+    return undefined
+  }
+  if (checkResult.status !== 1) {
+    return `Can't format ${file}:\n ${formatOutput(checkResult)}`
+  }
+
+  const content = await fs.readFile(path.join(config.braveCoreDir, file), {
+    encoding: 'utf-8',
   })
+  const formatResult = spawnSync(
+    'oxfmt',
+    ['--config', oxfmtConfigPath, '--stdin-filepath', file],
+    {
+      cwd: config.braveCoreDir,
+      stdio: 'pipe',
+      input: content,
+    },
+  )
+  if (formatResult.status !== 0) {
+    return `Can't format ${file}:\n ${formatOutput(formatResult)}`
+  }
+
+  const formatted = formatResult.stdout.toString()
   if (content !== formatted) {
-    return await handleDifference(file, dryRun, formatted)
+    return await handleDifference(
+      path.join(config.braveCoreDir, file),
+      true,
+      formatted,
+    )
   }
 
   return undefined
 }
 
-const runPrettier = async (
+const runOxfmt = async (
   files: string[],
   dryRun: boolean,
 ): Promise<string[]> => {
-  console.log('run prettier for', files.length, 'files')
+  console.log('run oxfmt for', files.length, 'files')
+  const oxfmtConfigPath = path.join(config.braveCoreDir, '.oxfmtrc.json')
+  if (!fs.existsSync(oxfmtConfigPath)) {
+    throw new Error(`${oxfmtConfigPath} file not found`)
+  }
   const ignorePath = path.join(config.braveCoreDir, '.prettierignore')
   if (!fs.existsSync(ignorePath)) {
     throw new Error(`${ignorePath} file not found`)
   }
 
-  const prettierIssues: string[] = []
+  const oxfmtIssues: string[] = []
   for (const file of files) {
     try {
-      const issue = await runPrettierForFile(file, dryRun, ignorePath)
+      const issue = await runOxfmtForFile(file, dryRun)
       if (issue) {
-        prettierIssues.push(issue)
+        oxfmtIssues.push(issue)
       }
     } catch (e) {
-      prettierIssues.push(`Can't format ${file}:\n ${e}`)
+      oxfmtIssues.push(`Can't format ${file}:\n ${e}`)
     }
   }
 
-  return prettierIssues
+  return oxfmtIssues
 }
 
 const runMojomFormatForFile = async (

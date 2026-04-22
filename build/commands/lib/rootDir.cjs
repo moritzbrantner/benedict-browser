@@ -16,7 +16,13 @@ if (process.platform === 'win32') {
   dirName = fs.realpathSync.native(dirName)
 }
 
-const rootDir = path.resolve(dirName, '..', '..', '..', '..', '..')
+const braveCoreCheckoutDir = path.resolve(dirName, '..', '..', '..')
+const chromiumCheckoutDir = path.resolve(braveCoreCheckoutDir, '..', '..')
+const rootDir = fs.existsSync(
+  path.join(chromiumCheckoutDir, 'src', 'brave', 'package.json'),
+)
+  ? chromiumCheckoutDir
+  : braveCoreCheckoutDir
 if (rootDir.includes(' ')) {
   console.error(
     `Root directory contains spaces, this is not supported: ${rootDir}`,

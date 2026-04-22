@@ -6,26 +6,27 @@
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { vi, type MockInstance } from 'vitest'
 import { dumpBuildHangDiagnostics } from './buildDiagnostics.ts'
 import * as Log from './log.ts'
 
-jest.mock('./log.ts', () => ({
-  error: jest.fn(),
+vi.mock('./log.ts', () => ({
+  error: vi.fn(),
 }))
 
 describe('dumpBuildHangDiagnostics', () => {
   let tempDir: string
-  let consoleLogSpy: jest.SpyInstance
+  let consoleLogSpy: MockInstance
 
   beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-diagnostics-'))
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
-    jest.clearAllMocks()
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     consoleLogSpy.mockRestore()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fs.rmSync(tempDir, { recursive: true, force: true })
   })
 
@@ -68,12 +69,12 @@ describe('dumpBuildHangDiagnostics', () => {
     expect(consoleLogSpy).not.toHaveBeenCalled()
   })
 
-  it('logs read errors without throwing', () => {
+  it('logs read errors without throwing', async () => {
     const diagPath = path.join(tempDir, 'siso.INFO')
     fs.writeFileSync(diagPath, 'content that will not be read', 'utf8')
 
-    const realFs = jest.requireActual('node:fs') as typeof import('node:fs')
-    jest.spyOn(fs, 'openSync').mockImplementation((...args) => {
+    const realFs = await vi.importActual<typeof import('node:fs')>('node:fs')
+    vi.spyOn(fs, 'openSync').mockImplementation((...args) => {
       if (args[0] === diagPath) {
         throw new Error('open failed')
       }

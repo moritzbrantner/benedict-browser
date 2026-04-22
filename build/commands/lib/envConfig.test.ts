@@ -7,14 +7,13 @@ import assert from 'node:assert'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { vi } from 'vitest'
 import EnvConfig from './envConfig.ts'
 import * as Log from './log.ts'
 
-/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect*"] }] */
-
 // Mock the logging module
-jest.mock('./log.ts', () => ({
-  error: jest.fn(),
+vi.mock('./log.ts', () => ({
+  error: vi.fn(),
 }))
 
 describe('EnvConfig', () => {
@@ -47,16 +46,16 @@ describe('EnvConfig', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockFiles = {}
 
     // Mock fs.existsSync
-    jest.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
+    vi.spyOn(fs, 'existsSync').mockImplementation((filePath) => {
       return mockFiles.hasOwnProperty(filePath.toString())
     })
 
     // Mock fs.readFileSync
-    jest.spyOn(fs, 'readFileSync').mockImplementation((filePath) => {
+    vi.spyOn(fs, 'readFileSync').mockImplementation((filePath) => {
       if (!mockFiles.hasOwnProperty(filePath.toString())) {
         throw new Error(`ENOENT: no such file or directory, open '${filePath}'`)
       }
@@ -74,18 +73,18 @@ describe('EnvConfig', () => {
     })
 
     // Mock fs.writeFileSync
-    jest.spyOn(fs, 'writeFileSync').mockImplementation((filePath, data) => {
+    vi.spyOn(fs, 'writeFileSync').mockImplementation((filePath, data) => {
       mockFiles[filePath.toString()] = data
     })
 
     // Mock process.exit to prevent tests from exiting
-    jest.spyOn(process, 'exit').mockImplementation(() => {
+    vi.spyOn(process, 'exit').mockImplementation(() => {
       throw new Error('process.exit called')
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('constructor', () => {
