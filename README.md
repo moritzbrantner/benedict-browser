@@ -1,8 +1,10 @@
-![Brave Browser](./docs/images/brave.svg)
+![Benedict Browser](./docs/images/brave.svg)
 
-# Brave Core
+# Benedict Browser Core
 
-Brave Core is a set of changes, APIs, and scripts used for customizing Chromium to make the Brave browser. Please also check https://github.com/brave/brave-browser which only holds the issues, releases and the wiki.
+Benedict Browser Core is a set of changes, APIs, and scripts used for customizing Chromium to make Benedict Browser.
+
+The Christian Browser.
 
 ## Overview
 

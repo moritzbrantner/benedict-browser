@@ -1,9 +1,9 @@
 COMPANY_FULLNAME=Brave Software, Inc.
 COMPANY_SHORTNAME=Brave Software
-PRODUCT_FULLNAME=Brave Browser Dev
-PRODUCT_SHORTNAME=Brave Dev
-PRODUCT_INSTALLER_FULLNAME=Brave Installer
-PRODUCT_INSTALLER_SHORTNAME=Brave Installer
+PRODUCT_FULLNAME=Benedict Browser Dev
+PRODUCT_SHORTNAME=Benedict Browser Dev
+PRODUCT_INSTALLER_FULLNAME=Benedict Browser Installer
+PRODUCT_INSTALLER_SHORTNAME=Benedict Browser Installer
 COPYRIGHT=Copyright 2016 The Brave Authors. All rights reserved.
 MAC_BUNDLE_ID=com.brave.Browser.dev
 MAC_CREATOR_CODE=Cr24

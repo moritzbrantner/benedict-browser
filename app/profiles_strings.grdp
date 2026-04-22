@@ -1105,7 +1105,7 @@
       Set your default browser
     </message>
     <message name="IDS_FRE_DEFAULT_BROWSER_SUBTITLE" desc="Subtitle for the page that prompts user to set Brave as their default browser in the first run experience.">
-      Get Brave Search and Brave smarts every time you browse
+      The Christian Browser
     </message>
     <message name="IDS_FRE_DEFAULT_BROWSER_SET_AS_DEFAULT" desc="The label for a button to confirm setting Brave as their default browser.">
       Set as default

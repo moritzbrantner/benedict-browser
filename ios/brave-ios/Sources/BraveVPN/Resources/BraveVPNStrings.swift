@@ -246,7 +246,7 @@ extension Strings {
       "vpn.subscribeVPNProtectionPopOverTitle",
       tableName: "BraveShared",
       bundle: .module,
-      value: "Did you know that Brave VPN protects you outside of Brave Browser?",
+      value: "Did you know that Brave VPN protects you outside of Benedict Browser?",
       comment: "Pop up title for subscribing VPN explaning VPN protects user outside the Brave"
     )
 
@@ -263,7 +263,7 @@ extension Strings {
       tableName: "BraveShared",
       bundle: .module,
       value:
-        "Brave VPN has always blocked trackers on every app, even outside the Brave browser. Now you can see who tried to track you, with the Brave Privacy Hub.",
+        "Brave VPN has always blocked trackers on every app, even outside Benedict Browser. Now you can see who tried to track you, with the Brave Privacy Hub.",
       comment:
         "Pop up description for subscribing VPN explaning VPN protects user outside the Brave"
     )

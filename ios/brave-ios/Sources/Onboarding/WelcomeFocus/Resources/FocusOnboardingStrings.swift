@@ -36,7 +36,7 @@ extension Strings {
       "focusOnboarding.p3aScreenTitle",
       tableName: "FocusOnboarding",
       bundle: .module,
-      value: "Make Brave Better",
+      value: "Make Benedict Browser Better",
       comment: "The title of the screen which asks user to enable privacy preserving analytics."
     )
 
@@ -79,7 +79,7 @@ extension Strings {
       "focusOnboarding.defaultBrowserScreenDescription",
       tableName: "FocusOnboarding",
       bundle: .module,
-      value: "Set Brave as your default browser today.",
+      value: "Set Benedict Browser as your default browser today.",
       comment: "The subtitle of the screen that requests user to set Brave as default"
     )
 
@@ -87,7 +87,7 @@ extension Strings {
       "focusOnboarding.addToDockScreenTitle",
       tableName: "FocusOnboarding",
       bundle: .module,
-      value: "Add Brave to Your Dock",
+      value: "Add Benedict Browser to Your Dock",
       comment: "The title of the screen that explains how to add Brave to the iOS dock"
     )
 
@@ -95,7 +95,7 @@ extension Strings {
       "focusOnboarding.addToDockScreenDescription",
       tableName: "FocusOnboarding",
       bundle: .module,
-      value: "Touch and hold the Brave icon, then drag it into your dock for quick access.",
+      value: "Touch and hold the Benedict Browser icon, then drag it into your dock for quick access.",
       comment: "The subtitle of the screen that explains how to add Brave to the iOS dock"
     )
 

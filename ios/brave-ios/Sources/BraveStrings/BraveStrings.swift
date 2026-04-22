@@ -646,7 +646,7 @@ extension Strings {
         "defaultBrowserCallout.introTertiaryText",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Open Settings, tap Default Browser App, and select Brave.",
+        value: "Open Settings, tap Default Browser App, and select Benedict Browser.",
         comment: "Tertiary text on default browser popup screen"
       )
     public static let introOpenSettingsButtonText =
@@ -662,7 +662,7 @@ extension Strings {
         "defaultBrowserCallout.notificationTitle",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Get Brave protection, on every link",
+        value: "Get Benedict Browser protection on every link",
         comment: "Notification title to promote setting Brave app as default browser"
       )
 
@@ -671,7 +671,7 @@ extension Strings {
         "defaultBrowserCallout.notificationBody",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Set Brave as your default browser",
+        value: "Set Benedict Browser as your default browser",
         comment: "Notification body to promote setting Brave app as default browser"
       )
   }
@@ -695,7 +695,7 @@ extension Strings {
         tableName: "BraveShared",
         bundle: .module,
         value:
-          "Get Brave privacy on your computer or tablet, and sync bookmarks & extensions between devices.",
+          "Get Benedict Browser privacy on your computer or tablet, and sync bookmarks & extensions between devices.",
         comment: "Subtitle - Description for Privacy Everywhere Full Screen Callout"
       )
     public static let privacyEverywhereCalloutPrimaryButtonTitle =
@@ -1242,7 +1242,7 @@ extension Strings {
       "tabGrid.privateBrowsingInfoBulletThreeBody",
       tableName: "BraveShared",
       bundle: .module,
-      value: "Brave VPN encrypts and protects anything you do online, even outside the Brave browser.",
+      value: "Brave VPN encrypts and protects anything you do online, even outside Benedict Browser.",
       comment: "A bullet point explaining the benefits of Brave VPN"
     )
     public static let selectedTabs = NSLocalizedString(
@@ -3884,7 +3884,7 @@ extension Strings {
     "OBSearchEngineTitle",
     tableName: "BraveShared",
     bundle: .module,
-    value: "Welcome to Brave Browser",
+    value: "Welcome to Benedict Browser",
     comment: "Title for search engine onboarding screen"
   )
   public static let OBSearchEngineDetail = NSLocalizedString(
@@ -4870,7 +4870,7 @@ extension Strings {
         tableName: "BraveShared",
         bundle: .module,
         value:
-          "Adds a playlist button beside the address bar in the Brave browser. This button gives you quick access to open Playlist, or add or remove media.",
+          "Adds a playlist button beside the address bar in Benedict Browser. This button gives you quick access to open Playlist, or add or remove media.",
         comment: "Footer for option to disable URL-Bar button"
       )
 
@@ -5820,7 +5820,7 @@ extension Strings {
         "shortcuts.activityTypeOpenBookmarksTitle",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Open Brave Browser Bookmarks",
+        value: "Open Benedict Browser Bookmarks",
         comment: ""
       )
 
@@ -5829,7 +5829,7 @@ extension Strings {
         "shortcuts.activityTypeOpenHistoryListTitle",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Open Brave Browser History",
+        value: "Open Benedict Browser History",
         comment: ""
       )
 
@@ -5838,7 +5838,7 @@ extension Strings {
         "shortcuts.activityTypeClearHistoryTitle",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Clear Brave Browsing History",
+        value: "Clear Benedict Browser Browsing History",
         comment: ""
       )
 
@@ -5847,7 +5847,7 @@ extension Strings {
         "shortcuts.activityTypeEnableVPNTitle",
         tableName: "BraveShared",
         bundle: .module,
-        value: "Open Brave Browser and Enable VPN",
+        value: "Open Benedict Browser and Enable VPN",
         comment: ""
       )
 
