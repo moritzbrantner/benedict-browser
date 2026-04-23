@@ -15,6 +15,7 @@
 #include "brave/components/brave_shields/core/common/features.h"
 #include "brave/components/brave_vpn/common/buildflags/buildflags.h"
 #include "brave/components/cosmetic_filters/renderer/cosmetic_filters_js_render_frame_observer.h"
+#include "brave/components/nsfw_filter/renderer/nsfw_filter_render_frame_observer.h"
 #include "brave/components/playlist/content/renderer/playlist_render_frame_observer.h"
 #include "brave/components/playlist/core/common/features.h"
 #include "brave/components/safe_builtins/renderer/safe_builtins.h"
@@ -74,6 +75,17 @@
 #endif
 
 namespace {
+nsfw_filter::NsfwFilterConfig GetNsfwFilterConfig() {
+  const auto& params = BraveRenderThreadObserver::GetDynamicParams();
+  nsfw_filter::NsfwFilterConfig config;
+  config.enabled = params.nsfw_filter_enabled;
+  config.moderate_threshold = params.nsfw_filter_moderate_threshold;
+  config.high_threshold = params.nsfw_filter_high_threshold;
+  config.moderate_action = params.nsfw_filter_moderate_action;
+  config.high_action = params.nsfw_filter_high_action;
+  return config;
+}
+
 void MaybeRemoveWidevineSupport(media::GetSupportedKeySystemsCB cb,
                                 media::KeySystemInfos key_systems) {
 #if BUILDFLAG(ENABLE_WIDEVINE)
@@ -172,6 +184,10 @@ void BraveContentRendererClient::RenderFrameCreated(
 #endif
 
   new script_injector::ScriptInjectorRenderFrameObserver(render_frame);
+
+  new nsfw_filter::NsfwFilterRenderFrameObserver(
+      render_frame, ISOLATED_WORLD_ID_BRAVE_INTERNAL,
+      base::BindRepeating(&GetNsfwFilterConfig));
 
   if (brave_search::IsDefaultAPIEnabled()) {
     new brave_search::BraveSearchRenderFrameObserver(

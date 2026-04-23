@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "base/no_destructor.h"
+#include "brave/components/nsfw_filter/renderer/nsfw_filter_render_frame_observer.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_registry.h"
 
 namespace {
@@ -61,6 +62,7 @@ void BraveRenderThreadObserver::SetInitialConfiguration(
 void BraveRenderThreadObserver::SetConfiguration(
     brave::mojom::DynamicParamsPtr params) {
   *GetDynamicConfigParams() = std::move(*params);
+  nsfw_filter::NsfwFilterRenderFrameObserver::ApplyConfigurationToAllFrames();
 }
 
 bool BraveRenderThreadObserver::IsOnionAllowed() const {

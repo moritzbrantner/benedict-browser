@@ -73,6 +73,9 @@ export default function addBraveRoutes(r: Partial<SettingsRoutes>) {
     }
     r.FONTS = r.BRAVE_CONTENT.createChild('/fonts')
   }
+  if (pageVisibility.nsfwFilter) {
+    r.NSFW_FILTER = r.BASIC.createSection('/imageFilter', 'nsfwFilter')
+  }
   if (pageVisibility.surveyPanelist && r.PRIVACY) {
     r.BRAVE_SURVEY_PANELIST =
       r.PRIVACY.createChild('/surveyPanelist')

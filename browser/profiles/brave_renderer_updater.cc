@@ -62,6 +62,12 @@ BraveRendererUpdater::BraveRendererUpdater(
 #endif
 
   de_amp_enabled_.Init(de_amp::kDeAmpPrefEnabled, pref_service);
+  nsfw_filter_enabled_.Init(kNsfwFilterEnabled, pref_service);
+  nsfw_filter_moderate_threshold_.Init(kNsfwFilterModerateThreshold,
+                                       pref_service);
+  nsfw_filter_high_threshold_.Init(kNsfwFilterHighThreshold, pref_service);
+  nsfw_filter_moderate_action_.Init(kNsfwFilterModerateAction, pref_service);
+  nsfw_filter_high_action_.Init(kNsfwFilterHighAction, pref_service);
 #if BUILDFLAG(ENABLE_TOR)
   onion_only_in_tor_windows_.Init(tor::prefs::kOnionOnlyInTorWindows,
                                   pref_service);
@@ -88,6 +94,26 @@ BraveRendererUpdater::BraveRendererUpdater(
 #endif
   pref_change_registrar_.Add(
       de_amp::kDeAmpPrefEnabled,
+      base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
+                          base::Unretained(this)));
+  pref_change_registrar_.Add(
+      kNsfwFilterEnabled,
+      base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
+                          base::Unretained(this)));
+  pref_change_registrar_.Add(
+      kNsfwFilterModerateThreshold,
+      base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
+                          base::Unretained(this)));
+  pref_change_registrar_.Add(
+      kNsfwFilterHighThreshold,
+      base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
+                          base::Unretained(this)));
+  pref_change_registrar_.Add(
+      kNsfwFilterModerateAction,
+      base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
+                          base::Unretained(this)));
+  pref_change_registrar_.Add(
+      kNsfwFilterHighAction,
       base::BindRepeating(&BraveRendererUpdater::UpdateAllRenderers,
                           base::Unretained(this)));
 #if BUILDFLAG(ENABLE_BRAVE_WALLET)
@@ -295,6 +321,12 @@ void BraveRendererUpdater::UpdateRenderer(
   params->onion_only_in_tor_windows = onion_only_in_tor_windows;
   params->widevine_enabled = widevine_enabled;
   params->playlist_enabled = playlist_enabled;
+  params->nsfw_filter_enabled = nsfw_filter_enabled_.GetValue();
+  params->nsfw_filter_moderate_threshold =
+      nsfw_filter_moderate_threshold_.GetValue();
+  params->nsfw_filter_high_threshold = nsfw_filter_high_threshold_.GetValue();
+  params->nsfw_filter_moderate_action = nsfw_filter_moderate_action_.GetValue();
+  params->nsfw_filter_high_action = nsfw_filter_high_action_.GetValue();
 
   (*renderer_configuration)->SetConfiguration(std::move(params));
 }

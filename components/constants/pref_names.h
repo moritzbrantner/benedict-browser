@@ -109,6 +109,16 @@ inline constexpr char kDontAskForCrashReporting[] =
 inline constexpr char kEnableMediaRouterOnRestart[] =
     "brave.enable_media_router_on_restart";
 
+inline constexpr char kNsfwFilterEnabled[] = "brave.nsfw_filter.enabled";
+inline constexpr char kNsfwFilterModerateThreshold[] =
+    "brave.nsfw_filter.moderate_threshold";
+inline constexpr char kNsfwFilterHighThreshold[] =
+    "brave.nsfw_filter.high_threshold";
+inline constexpr char kNsfwFilterModerateAction[] =
+    "brave.nsfw_filter.moderate_action";
+inline constexpr char kNsfwFilterHighAction[] =
+    "brave.nsfw_filter.high_action";
+
 #if BUILDFLAG(IS_ANDROID)
 inline constexpr char kDesktopModeEnabled[] = "brave.desktop_mode_enabled";
 inline constexpr char kPlayYTVideoInBrowserEnabled[] =

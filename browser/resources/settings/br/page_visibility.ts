@@ -25,6 +25,7 @@ declare module '../page_visibility.js' {
     leoPersonalization?: boolean
     leoModels?: boolean
     newTab?: boolean
+    nsfwFilter?: boolean
     origin?: boolean
     playlist?: boolean
     shields?: boolean
@@ -61,6 +62,7 @@ function getPageVisibility () {
       leoPersonalization: false,
       leoModels: false,
       newTab: false,
+      nsfwFilter: false,
       origin: false,
       playlist: false,
       shields: true,
@@ -112,6 +114,7 @@ function getPageVisibility () {
     braveTor: !loadTimeData.getBoolean('braveTorDisabledByPolicy') ||
               loadTimeData.getBoolean('shouldExposeElementsForTesting'),
     // </if>
+    nsfwFilter: alwaysTrueProxy,
     origin: loadTimeData.getBoolean('isBraveOriginPurchased') &&
             !loadTimeData.getBoolean('isBraveOriginBrandedBuild'),
   }

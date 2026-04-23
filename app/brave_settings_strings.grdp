@@ -94,6 +94,30 @@
   <message name="IDS_SETTINGS_APPEARANCE_SETTINGS_CONTENT_SECTION" desc="The label for section containing settings related to content">
     Content
   </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_LABEL" desc="The label for a setting that enables filtering of potentially explicit images on web pages">
+    Filter potentially explicit images
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_PAGE_TITLE" desc="The settings menu item and page title for configuring filtering of potentially explicit images on web pages">
+    Explicit image filter
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_MODERATE_ACTION_LABEL" desc="The label for a dropdown that chooses what to do with images that receive a moderate explicit-content score">
+    Moderate score action
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_HIGH_ACTION_LABEL" desc="The label for a dropdown that chooses what to do with images that receive a high explicit-content score">
+    High score action
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_ACTION_NOTHING" desc="Dropdown option for taking no action on a potentially explicit image">
+    Do nothing
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_ACTION_BLUR" desc="Dropdown option for blurring a potentially explicit image">
+    Blur
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_ACTION_HIDE" desc="Dropdown option for hiding a potentially explicit image while keeping its layout space">
+    Hide
+  </message>
+  <message name="IDS_SETTINGS_NSFW_FILTER_ACTION_COLLAPSE" desc="Dropdown option for hiding a potentially explicit image and removing its layout space">
+    Collapse
+  </message>
   <if expr="enable_containers">
     <message name="IDS_SETTINGS_CONTAINERS_SECTION_LABEL" desc="The label for section containing settings related to containers" formatter_data="webui=Containers">
       Containers

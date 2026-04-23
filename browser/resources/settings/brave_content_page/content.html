@@ -48,6 +48,32 @@
     pref="{{prefs.browser.split_view_drag_and_drop_enabled}}"
     label="$i18n{allowSplitViewDragAndDrop}">
 </settings-toggle-button>
+<settings-toggle-button class="hr" id="nsfw-filter"
+    pref="{{prefs.brave.nsfw_filter.enabled}}"
+    label="$i18n{nsfwFilterLabel}">
+</settings-toggle-button>
+<template is="dom-if" if="[[prefs.brave.nsfw_filter.enabled.value]]">
+  <div class="cr-row continuation">
+    <div class="flex cr-padded-text" aria-hidden="true">
+      $i18n{nsfwFilterModerateActionLabel}
+    </div>
+    <settings-dropdown-menu id="nsfwModerateAction"
+        label="$i18n{nsfwFilterModerateActionLabel}"
+        pref="{{prefs.brave.nsfw_filter.moderate_action}}"
+        menu-options="[[nsfwFilterActionOptions_]]">
+    </settings-dropdown-menu>
+  </div>
+  <div class="cr-row continuation">
+    <div class="flex cr-padded-text" aria-hidden="true">
+      $i18n{nsfwFilterHighActionLabel}
+    </div>
+    <settings-dropdown-menu id="nsfwHighAction"
+        label="$i18n{nsfwFilterHighActionLabel}"
+        pref="{{prefs.brave.nsfw_filter.high_action}}"
+        menu-options="[[nsfwFilterActionOptions_]]">
+    </settings-dropdown-menu>
+  </div>
+</template>
 <if expr="enable_brave_wayback_machine">
   <settings-toggle-button
     class="cr-row"

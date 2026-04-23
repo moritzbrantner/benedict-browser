@@ -561,6 +561,12 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
   // kEnableMediaRouterOnRestart is used to remember the user's choice.
   registry->RegisterBooleanPref(kEnableMediaRouterOnRestart, true);
 
+  registry->RegisterBooleanPref(kNsfwFilterEnabled, false);
+  registry->RegisterIntegerPref(kNsfwFilterModerateThreshold, 55);
+  registry->RegisterIntegerPref(kNsfwFilterHighThreshold, 85);
+  registry->RegisterIntegerPref(kNsfwFilterModerateAction, 1);
+  registry->RegisterIntegerPref(kNsfwFilterHighAction, 2);
+
   BraveFarblingService::RegisterProfilePrefs(registry);
 
   RegisterProfilePrefsForMigration(registry);

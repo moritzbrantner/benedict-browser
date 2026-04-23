@@ -11,6 +11,7 @@ import {
 import { loadTimeData } from '../i18n_setup.js'
 
 import '../brave_content_page/content_page_index.js'
+import '../brave_content_page/nsfw_filter.js'
 import '../getting_started_page/getting_started_page_index.js'
 import '../brave_origin_page/brave_origin_page.js'
 import '../default_brave_shields_page/shields_page_index.js'
@@ -101,6 +102,22 @@ RegisterPolymerTemplateModifications({
                 prefs="{{prefs}}"
                 in-search-mode="[[inSearchMode_]]">
               </settings-brave-content-page-index>
+            </template>
+          </div>
+        </template>
+      `)
+
+    // Insert the explicit image filter page into the view manager
+    switcher.appendChild(
+      html`
+        <template is="dom-if" if="[[showPage_(pageVisibility_.nsfwFilter)]]">
+          <div slot="view" id="nsfwFilter" class="cr-centered-card-container">
+            <template is="dom-if" if="[[renderPlugin_(
+          routes_.NSFW_FILTER, lastRoute_, inSearchMode_)]]">
+              <settings-brave-nsfw-filter
+                prefs="{{prefs}}"
+                in-search-mode="[[inSearchMode_]]">
+              </settings-brave-nsfw-filter>
             </template>
           </div>
         </template>

@@ -80,6 +80,22 @@ export class SettingsBraveContentContentElement extends SettingsBraveAppearanceC
         },
       },
 
+      nsfwFilterActionOptions_: {
+        readOnly: true,
+        type: Array,
+        value() {
+          return [
+            {value: 0, name: loadTimeData.getString('nsfwFilterActionNothing')},
+            {value: 1, name: loadTimeData.getString('nsfwFilterActionBlur')},
+            {value: 2, name: loadTimeData.getString('nsfwFilterActionHide')},
+            {
+              value: 3,
+              name: loadTimeData.getString('nsfwFilterActionCollapse'),
+            },
+          ]
+        },
+      },
+
     }
   }
 
@@ -90,6 +106,7 @@ export class SettingsBraveContentContentElement extends SettingsBraveAppearanceC
   }
 
   private declare fontSizeOptions_: DropdownMenuOptionList
+  private declare nsfwFilterActionOptions_: DropdownMenuOptionList
   private declare pageZoomLevels_: number[]
   private declare defaultZoom_: number;
   private declare showSplitViewDragAndDropSetting_: boolean;

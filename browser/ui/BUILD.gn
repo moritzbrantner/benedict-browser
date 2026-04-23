@@ -244,6 +244,8 @@ source_set("ui") {
 
   if (!is_android) {
     sources += [
+      "bookmark/bookmark_archive.cc",
+      "bookmark/bookmark_archive.h",
       "bookmark/bookmark_helper.cc",
       "bookmark/bookmark_helper.h",
       "bookmark/bookmark_prefs_service.cc",

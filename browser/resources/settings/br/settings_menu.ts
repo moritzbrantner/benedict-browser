@@ -270,6 +270,15 @@ RegisterPolymerTemplateModifications({
       appearanceBrowserEl.insertAdjacentElement('afterend', contentEl)
     }
 
+    // Add explicit image filter item
+    const nsfwFilterEl = createMenuElement(
+      loadTimeData.getString('nsfwFilterPageTitle'),
+      '/imageFilter',
+      'tune',
+      'nsfwFilter',
+    )
+    contentEl.insertAdjacentElement('afterend', nsfwFilterEl)
+
     // Add Shields item
     const shieldsEl = createMenuElement(
       loadTimeData.getString('braveShieldsTitle'),
@@ -277,7 +286,7 @@ RegisterPolymerTemplateModifications({
       'shield-done',
       'shields',
     )
-    contentEl.insertAdjacentElement('afterend', shieldsEl)
+    nsfwFilterEl.insertAdjacentElement('afterend', shieldsEl)
 
     // Add privacy item
     const privacyEl = getMenuElement(templateContent, '/privacy')

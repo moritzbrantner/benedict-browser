@@ -85,6 +85,11 @@ class BraveRendererUpdater : public KeyedService {
   BooleanPrefMember onion_only_in_tor_windows_;
 #endif
   BooleanPrefMember widevine_enabled_;
+  BooleanPrefMember nsfw_filter_enabled_;
+  IntegerPrefMember nsfw_filter_moderate_threshold_;
+  IntegerPrefMember nsfw_filter_high_threshold_;
+  IntegerPrefMember nsfw_filter_moderate_action_;
+  IntegerPrefMember nsfw_filter_high_action_;
 #if BUILDFLAG(ENABLE_BRAVE_WALLET)
   bool is_wallet_allowed_for_context_ = false;
   bool is_wallet_created_ = false;

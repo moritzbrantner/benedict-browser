@@ -7,13 +7,13 @@
 
 #include <components/history_embeddings/core/history_embeddings_features.cc>
 
-// Keep upstream history embeddings flags disabled by default. Users can
-// enable kHistoryEmbeddings via about:flags. kHistoryEmbeddingsAnswers
-// is not used by Brave.
+// Enable local semantic history search by default. Answers remain disabled:
+// Brave currently supplies embeddings through the local EmbeddingGemma worker,
+// but not the upstream answer-generation path.
 namespace history_embeddings {
 
 OVERRIDE_FEATURE_DEFAULT_STATES({{
-    {kHistoryEmbeddings, base::FEATURE_DISABLED_BY_DEFAULT},
+    {kHistoryEmbeddings, base::FEATURE_ENABLED_BY_DEFAULT},
     {kHistoryEmbeddingsAnswers, base::FEATURE_DISABLED_BY_DEFAULT},
 }});
 

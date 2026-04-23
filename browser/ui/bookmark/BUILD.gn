@@ -6,12 +6,17 @@
 source_set("unittest") {
   testonly = true
   assert(!is_android)
-  sources = [ "bookmark_helper_unittest.cc" ]
+  sources = [
+    "bookmark_archive_unittest.cc",
+    "bookmark_helper_unittest.cc",
+  ]
 
   deps = [
     "//chrome/browser/ui",
     "//components/bookmarks/browser",
+    "//components/bookmarks/test",
     "//components/sync_preferences:test_support",
     "//testing/gtest",
+    "//url",
   ]
 }

@@ -23,6 +23,11 @@ struct DynamicParams {
   bool onion_only_in_tor_windows = true;
   bool widevine_enabled = false;
   bool playlist_enabled = false;
+  bool nsfw_filter_enabled = false;
+  int32 nsfw_filter_moderate_threshold = 55;
+  int32 nsfw_filter_high_threshold = 85;
+  int32 nsfw_filter_moderate_action = 1;
+  int32 nsfw_filter_high_action = 2;
 };
 
 // Configures the renderer.

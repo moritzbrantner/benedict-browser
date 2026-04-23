@@ -33,6 +33,7 @@ brave_settings_web_component_files = [
   "brave_clear_browsing_data_dialog/brave_clear_browsing_data_on_exit_page_v2.ts",
   "brave_content_page/content.ts",
   "brave_content_page/content_page_index.ts",
+  "brave_content_page/nsfw_filter.ts",
   "brave_content_page/playlist.ts",
   "brave_data_collection_page/brave_data_collection_page.ts",
   "brave_default_extensions_page/brave_default_extensions_page.ts",

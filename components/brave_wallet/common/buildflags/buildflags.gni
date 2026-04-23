@@ -6,5 +6,6 @@
 import("//brave/components/brave_origin/buildflags/buildflags.gni")
 
 declare_args() {
-  enable_brave_wallet = !is_brave_origin_branded
+  # Benedict Browser does not ship Brave Wallet or BAT asset surfaces.
+  enable_brave_wallet = false
 }
