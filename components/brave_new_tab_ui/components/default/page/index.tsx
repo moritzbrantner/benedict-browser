@@ -6,6 +6,7 @@
 import * as React from 'react'
 import styled, { createGlobalStyle, css } from 'styled-components'
 import { requestAnimationFrameThrottle } from '../../../../common/throttle'
+import { getLiturgicalDay } from '../../../helpers/liturgicalCalendar'
 import { defaultState } from '../../../storage/new_tab_storage'
 import { font, spacing } from '@brave/leo/tokens/css/variables'
 
@@ -25,6 +26,7 @@ interface HasImageProps {
   imageSrc?: string
   colorForBackground?: string
   hasSponsoredRichMediaBackground: boolean
+  liturgicalDate: Date
 }
 
 type AppProps = {
@@ -337,7 +339,7 @@ function getBackground(p: HasImageProps) {
   }
 
   if (!p.hasImage) {
-    return p.colorForBackground || `linear-gradient(to bottom right, #4D54D1, #A51C7B 50%, #EE4A37 100%)`
+    return p.colorForBackground || getLiturgicalDay(p.liturgicalDate).theme.background
   }
 
   if (p.hasImage && p.imageSrc) {
@@ -413,16 +415,17 @@ export const App = styled('div') <AppProps & HasImageProps>`
 export const Link = styled('a') <{}>`
   text-decoration: none;
   transition: color 0.15s ease, filter 0.15s ease;
-  color: white;
+  color: var(--override-readability-color, #ffffff);
 `
 
 export const Label = styled('span') <{}>`
   text-decoration: none;
   transition: color 0.15s ease, filter 0.15s ease;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--override-readability-color, #ffffff);
+  opacity: 0.8;
 
   &:hover {
-    color: rgba(255, 255, 255, 1);
+    opacity: 1;
   }
 `
 
@@ -431,8 +434,9 @@ export const PhotoName = styled('div') <{}>`
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
   font: ${font.small.regular};
-  color: white;
-  white-space: nowrap;
+  color: var(--override-readability-color, #ffffff);
+  max-width: 34ch;
+  text-align: right;
 `
 
 export const Navigation = styled('nav') <{}>`
@@ -485,7 +489,7 @@ export const IconButtonSideText = styled('label') <IconButtonSideTextProps>`
   align-items: center;
   padding-right: ${p => p.textDirection === 'ltr' && spacing.s};
   padding-left: ${p => p.textDirection === 'rtl' && spacing.s};
-  color: white;
+  color: var(--override-readability-color, #ffffff);
   cursor: pointer;
   user-select: none;
   width: max-content;
@@ -518,7 +522,7 @@ interface IconButtonContainerProps {
 
 export const IconButtonContainer = styled('div') <IconButtonContainerProps>`
   font: ${font.small.semibold};
-  color: var(--override-readability-color-rgb, 255, 255, 255);
+  color: var(--override-readability-color, #ffffff);
   margin-right: ${p => p.textDirection === 'ltr' && '8px'};
   margin-left: ${p => p.textDirection === 'rtl' && '8px'};
 
@@ -527,10 +531,9 @@ export const IconButtonContainer = styled('div') <IconButtonContainerProps>`
   }
 `
 
-export const OverrideReadabilityColor = createGlobalStyle<{ override: boolean }>`
+export const OverrideReadabilityColor = createGlobalStyle<{ colorOverride?: string }>`
   :root {
-    ${p => p.override && css`
-      --override-readability-color-rgb: 0, 0, 0;
-      --override-readability-color: rgb(0, 0, 0);`}
+    ${p => p.colorOverride && css`
+      --override-readability-color: ${p.colorOverride};`}
   }
 `

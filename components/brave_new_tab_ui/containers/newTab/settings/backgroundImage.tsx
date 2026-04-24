@@ -9,7 +9,6 @@ import {
   SettingsRow,
   SettingsText,
   StyledCustomBackgroundOption,
-  StyledCustomBackgroundOptionImage,
   StyledCustomBackgroundOptionLabel,
   StyledCustomBackgroundOptionColor,
   StyledCustomBackgroundSettings,
@@ -17,7 +16,6 @@ import {
   StyledUploadIconContainer,
   StyledUploadLabel
 } from '../../../components/default'
-import braveBackground from './assets/brave-background.png'
 import UploadIcon from './assets/upload-icon'
 import Toggle from '@brave/leo/react/toggle'
 
@@ -25,6 +23,7 @@ import { getLocale } from '../../../../common/locale'
 
 import BackgroundChooser from './backgroundChooser'
 import { defaultSolidBackgroundColor, solidColorsForBackground, gradientColorsForBackground, defaultGradientColor } from '../../../data/backgrounds'
+import { getLiturgicalDay } from '../../../helpers/liturgicalCalendar'
 import SponsoredImageToggle from './sponsoredImagesToggle'
 
 import { RANDOM_SOLID_COLOR_VALUE, RANDOM_GRADIENT_COLOR_VALUE, MAX_CUSTOM_IMAGE_BACKGROUNDS } from 'gen/brave/components/brave_new_tab_ui/brave_new_tab_page.mojom.m.js'
@@ -134,6 +133,7 @@ class BackgroundImageSettings extends React.PureComponent<Props, State> {
 
     const usingRandomCustomImageBackground = newTabData.backgroundWallpaper?.type === 'image' && !!newTabData.backgroundWallpaper.random
     const selectedCustomImageBackground = newTabData.backgroundWallpaper?.type === 'image' ? newTabData.backgroundWallpaper.wallpaperImageUrl : undefined
+    const liturgicalTheme = getLiturgicalDay(new Date()).theme
 
     return (
       <>
@@ -165,7 +165,10 @@ class BackgroundImageSettings extends React.PureComponent<Props, State> {
                   onClick={this.onClickBraveBackground}
                 >
                   <StyledSelectionBorder selected={usingBraveBackground}>
-                    <StyledCustomBackgroundOptionImage image={braveBackground} selected={usingBraveBackground}/>
+                    <StyledCustomBackgroundOptionColor
+                      colorValue={liturgicalTheme.background}
+                      selected={usingBraveBackground}
+                    />
                   </StyledSelectionBorder>
                   <StyledCustomBackgroundOptionLabel>
                     {getLocale('braveBackgroundImageOptionTitle')}

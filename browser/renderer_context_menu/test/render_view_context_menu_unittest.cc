@@ -46,6 +46,13 @@ content::ContextMenuParams CreateSelectedTextParams(
   return rv;
 }
 
+content::ContextMenuParams CreatePageParams() {
+  content::ContextMenuParams rv;
+  rv.is_editable = false;
+  rv.page_url = GURL("http://test.page/");
+  return rv;
+}
+
 content::ContextMenuParams CreateLinkParams(const GURL& selected_link) {
   content::ContextMenuParams rv;
   rv.is_editable = false;
@@ -165,6 +172,25 @@ TEST_F(BraveRenderViewContextMenuTest, MenuForPlainText) {
   std::optional<size_t> clean_link_index =
       context_menu->menu_model().GetIndexOfCommandId(IDC_COPY_CLEAN_LINK);
   EXPECT_FALSE(clean_link_index.has_value());
+
+  std::optional<size_t> archive_selection_index =
+      context_menu->menu_model().GetIndexOfCommandId(
+          IDC_CONTENT_CONTEXT_ARCHIVE_SELECTION);
+  EXPECT_TRUE(archive_selection_index.has_value());
+  EXPECT_TRUE(
+      context_menu->IsCommandIdEnabled(IDC_CONTENT_CONTEXT_ARCHIVE_SELECTION));
+}
+
+TEST_F(BraveRenderViewContextMenuTest, MenuForPageArchive) {
+  content::ContextMenuParams params = CreatePageParams();
+  auto context_menu = CreateContextMenu(GetWebContents(), params);
+  EXPECT_TRUE(context_menu);
+  std::optional<size_t> archive_page_index =
+      context_menu->menu_model().GetIndexOfCommandId(
+          IDC_CONTENT_CONTEXT_ARCHIVE_PAGE);
+  EXPECT_TRUE(archive_page_index.has_value());
+  EXPECT_TRUE(context_menu->IsCommandIdEnabled(
+      IDC_CONTENT_CONTEXT_ARCHIVE_PAGE));
 }
 
 TEST_F(BraveRenderViewContextMenuTest, MenuForSelectedUrl) {

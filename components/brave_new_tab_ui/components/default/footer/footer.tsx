@@ -4,6 +4,7 @@
 
 import * as React from 'react'
 import Icon from '@brave/leo/react/icon'
+import { getLiturgicalDay } from '../../../helpers/liturgicalCalendar'
 
 // Feature-specific components
 import {
@@ -22,8 +23,10 @@ import { getLocale } from '../../../../common/locale'
 
 export interface Props {
   textDirection: string
+  currentDate: Date
   backgroundImageInfo: NewTab.BackgroundWallpaper | undefined
   showPhotoInfo: boolean
+  showLiturgicalInfo: boolean
   onClickSettings: () => any
 }
 
@@ -31,10 +34,13 @@ export default class FooterInfo extends React.PureComponent<Props, {}> {
   render () {
     const {
       textDirection,
+      currentDate,
       backgroundImageInfo,
       showPhotoInfo,
+      showLiturgicalInfo,
       onClickSettings
     } = this.props
+    const liturgicalDay = getLiturgicalDay(currentDate)
 
     return (
       <>
@@ -51,6 +57,15 @@ export default class FooterInfo extends React.PureComponent<Props, {}> {
             </PhotoName>
           </S.GridItemCredits>
         }
+        {showLiturgicalInfo && (
+          <S.GridItemCredits>
+            <PhotoName>
+              {liturgicalDay.isFeastDay
+                ? `${liturgicalDay.rankLabel}: ${liturgicalDay.celebration}`
+                : `${liturgicalDay.seasonLabel} • ${liturgicalDay.colorLabel}`}
+            </PhotoName>
+          </S.GridItemCredits>
+        )}
         <S.GridItemNavigation>
           <Navigation>
             <IconButtonContainer textDirection={textDirection}>

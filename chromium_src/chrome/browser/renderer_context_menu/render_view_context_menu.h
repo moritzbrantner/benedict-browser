@@ -105,6 +105,11 @@ class RenderViewContextMenu : public RenderViewContextMenu_Chromium
   void BuildAIChatMenu();
 #endif
 
+  bool IsArchiveCommandEnabled() const;
+  void ExecuteArchivePageCommand();
+  void ExecuteArchiveSelectionCommand();
+  void BuildArchiveMenu();
+
 #if BUILDFLAG(ENABLE_CONTAINERS)
   void BuildContainersMenu();
 #endif  // BUILDFLAG(ENABLE_CONTAINERS)

@@ -4,13 +4,23 @@
 
 import * as React from 'react'
 import { useNewTabPref } from '../../../hooks/usePref'
+import { getLiturgicalDay } from '../../../helpers/liturgicalCalendar'
 
-import { StyledClock, StyledTime } from './style'
+import {
+  StyledCelebration,
+  StyledClock,
+  StyledClockMeta,
+  StyledDate,
+  StyledDateRow,
+  StyledFeastBadge,
+  StyledSeason,
+  StyledTime
+} from './style'
 
 // Tick once every two seconds.
 const TICK_RATE = 2000
 export function Clock () {
-  const [now, setNow] = React.useState<Date>()
+  const [now, setNow] = React.useState<Date>(() => new Date())
   const [clockFormat, setClockFormat] = useNewTabPref('clockFormat')
   const toggleClockFormat = () => {
     switch (clockFormat) {
@@ -42,7 +52,24 @@ export function Clock () {
       ? null
       : t.value), [formatter, now])
 
+  const dateFormatter = React.useMemo(() => new Intl.DateTimeFormat(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric'
+  }), [])
+
+  const liturgicalDay = React.useMemo(() => getLiturgicalDay(now), [now])
+  const formattedDate = React.useMemo(() => dateFormatter.format(now), [dateFormatter, now])
+
   return <StyledClock onDoubleClick={toggleClockFormat}>
     <StyledTime>{formattedTime}</StyledTime>
+    <StyledClockMeta>
+      <StyledDateRow>
+        <StyledDate>{formattedDate}</StyledDate>
+        {liturgicalDay.isFeastDay && <StyledFeastBadge>{liturgicalDay.rankLabel}</StyledFeastBadge>}
+      </StyledDateRow>
+      <StyledCelebration>{liturgicalDay.celebration}</StyledCelebration>
+      <StyledSeason>{liturgicalDay.seasonLabel}</StyledSeason>
+    </StyledClockMeta>
   </StyledClock>
 }

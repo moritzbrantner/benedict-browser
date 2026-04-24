@@ -219,6 +219,12 @@
         <message name="IDS_COPY_CLEAN_LINK" desc="The name of the context menu item to copy clean link">
           Copy Clean Link
         </message>
+        <message name="IDS_CONTENT_CONTEXT_ARCHIVE_PAGE" desc="The name of the context menu item to archive the current page as an HTML file">
+          Archive Page
+        </message>
+        <message name="IDS_CONTENT_CONTEXT_ARCHIVE_SELECTION" desc="The name of the context menu item to archive selected webpage content as an HTML file">
+          Archive Selection
+        </message>
         <message name="IDS_BOOKMAR_BAR_MENU_SHOW_NTP" desc="The name of the context menu item to show bookmark bar on ntp only">
           Only On the New Tab Page
         </message>
@@ -232,6 +238,12 @@
         </message>
         <message name="IDS_COPY_CLEAN_LINK" desc="The name of the context menu item to copy clean link">
           Copy clean link
+        </message>
+        <message name="IDS_CONTENT_CONTEXT_ARCHIVE_PAGE" desc="The name of the context menu item to archive the current page as an HTML file">
+          Archive page
+        </message>
+        <message name="IDS_CONTENT_CONTEXT_ARCHIVE_SELECTION" desc="The name of the context menu item to archive selected webpage content as an HTML file">
+          Archive selection
         </message>
         <message name="IDS_BOOKMAR_BAR_MENU_SHOW_NTP" desc="The name of the context menu item to show bookmark bar on ntp only">
            Only on the new tab page

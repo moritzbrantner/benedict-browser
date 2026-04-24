@@ -26,6 +26,7 @@ import { getLocale } from '$web-common/locale'
 import VisibilityTimer from '$web-common/visibilityTimer'
 import { loadTimeData } from '$web-common/loadTimeData'
 import isReadableOnBackground from '../../helpers/colorUtil'
+import { getLiturgicalDay } from '../../helpers/liturgicalCalendar'
 
 // Types
 import { NewTabActions } from '../../constants/new_tab_types'
@@ -82,6 +83,7 @@ interface State {
   isPromptingBraveNews: boolean
   showSearchPromotion: boolean
   forceToHideWidget: boolean
+  currentDate: Date
 }
 
 function GetBackgroundImageSrc (props: Props) {
@@ -97,8 +99,7 @@ function GetBackgroundImageSrc (props: Props) {
     }
   }
 
-  if (props.newTabData.backgroundWallpaper?.type === 'image' ||
-      props.newTabData.backgroundWallpaper?.type === 'brave') {
+  if (props.newTabData.backgroundWallpaper?.type === 'image') {
     return props.newTabData.backgroundWallpaper.wallpaperImageUrl
   }
 
@@ -170,7 +171,8 @@ class NewTabPage extends React.Component<Props, State> {
     activeSettingsTab: null,
     isPromptingBraveNews: false,
     showSearchPromotion: false,
-    forceToHideWidget: false
+    forceToHideWidget: false,
+    currentDate: new Date()
   }
 
   imgCache: HTMLImageElement
@@ -179,6 +181,7 @@ class NewTabPage extends React.Component<Props, State> {
   imageSource?: string = undefined
   sponsoredRichMediaBackgroundInfo?: SponsoredRichMediaBackgroundInfo = undefined
   timerIdForBrandedWallpaperNotification?: number = undefined
+  liturgicalRefreshTimerId?: number = undefined
   onVisiblityTimerExpired = () => {
     this.dismissBrandedWallpaperNotification(false)
   }
@@ -203,6 +206,8 @@ class NewTabPage extends React.Component<Props, State> {
     })
     window.addEventListener('resize', this.handleResize)
     window.navigation.addEventListener('currententrychange', this.checkShouldOpenSettings)
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
+    this.liturgicalRefreshTimerId = window.setInterval(this.refreshCurrentDate, 60000)
   }
 
   componentWillUnmount () {
@@ -211,6 +216,10 @@ class NewTabPage extends React.Component<Props, State> {
     }
     window.removeEventListener('resize', this.handleResize)
     window.navigation.removeEventListener('currententrychange', this.checkShouldOpenSettings)
+    document.removeEventListener('visibilitychange', this.onVisibilityChange)
+    if (this.liturgicalRefreshTimerId) {
+      window.clearInterval(this.liturgicalRefreshTimerId)
+    }
   }
 
   componentDidUpdate (prevProps: Props) {
@@ -275,8 +284,33 @@ class NewTabPage extends React.Component<Props, State> {
     }
   }
 
-  shouldOverrideReadabilityColor (newTabData: NewTab.State) {
-    return !newTabData.brandedWallpaper && newTabData.backgroundWallpaper?.type === 'color' && !isReadableOnBackground(newTabData.backgroundWallpaper)
+  refreshCurrentDate = () => {
+    this.setState({ currentDate: new Date() })
+  }
+
+  onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      this.refreshCurrentDate()
+    }
+  }
+
+  getReadabilityColorOverride (newTabData: NewTab.State) {
+    if (!newTabData.brandedWallpaper &&
+        newTabData.backgroundWallpaper?.type === 'color' &&
+        !isReadableOnBackground(newTabData.backgroundWallpaper)) {
+      return 'rgb(0, 0, 0)'
+    }
+
+    const usesLiturgicalTheme = !newTabData.brandedWallpaper &&
+      newTabData.backgroundWallpaper?.type !== 'image' &&
+      newTabData.backgroundWallpaper?.type !== 'color'
+
+    if (usesLiturgicalTheme) {
+      const textColor = getLiturgicalDay(this.state.currentDate).theme.textColor
+      return textColor === '#ffffff' ? undefined : textColor
+    }
+
+    return undefined
   }
 
   handleResize = () => {
@@ -666,8 +700,9 @@ class NewTabPage extends React.Component<Props, State> {
     const hasImage = this.imageSource !== undefined
     const hasSponsoredRichMediaBackground = !!this.sponsoredRichMediaBackgroundInfo
     const isShowingBrandedWallpaper = !!newTabData.brandedWallpaper
-
-    const hasWallpaperInfo = newTabData.backgroundWallpaper?.type === 'brave'
+    const usesLiturgicalTheme = !isShowingBrandedWallpaper &&
+      newTabData.backgroundWallpaper?.type !== 'image' &&
+      newTabData.backgroundWallpaper?.type !== 'color'
     const colorForBackground = newTabData.backgroundWallpaper?.type === 'color' ? newTabData.backgroundWallpaper.wallpaperColor : undefined
 
     let cryptoContent = this.renderCryptoContent()
@@ -699,8 +734,9 @@ class NewTabPage extends React.Component<Props, State> {
         imageHasLoaded={this.state.backgroundHasLoaded}
         colorForBackground={colorForBackground}
         hasSponsoredRichMediaBackground={hasSponsoredRichMediaBackground}
-        data-show-news-prompt={((this.state.backgroundHasLoaded || colorForBackground) && this.state.isPromptingBraveNews && !defaultState.featureFlagBraveNewsFeedV2Enabled) ? true : undefined}>
-        <OverrideReadabilityColor override={ this.shouldOverrideReadabilityColor(this.props.newTabData) } />
+        liturgicalDate={this.state.currentDate}
+        data-show-news-prompt={((this.state.backgroundHasLoaded || colorForBackground || usesLiturgicalTheme) && this.state.isPromptingBraveNews && !defaultState.featureFlagBraveNewsFeedV2Enabled) ? true : undefined}>
+        <OverrideReadabilityColor colorOverride={this.getReadabilityColorOverride(this.props.newTabData)} />
         <NewsProvider disabled={newTabData.isBraveNewsDisabledByPolicy}>
         <EngineContextProvider>
 
@@ -739,6 +775,7 @@ class NewTabPage extends React.Component<Props, State> {
             showClock={showClock}
             showStats={showStats}
             colorForBackground={colorForBackground}
+            liturgicalDate={this.state.currentDate}
             showCryptoContent={!!cryptoContent}
             showTopSites={showTopSites}
             showBrandedWallpaper={isShowingBrandedWallpaper}
@@ -812,8 +849,10 @@ class NewTabPage extends React.Component<Props, State> {
                   </Page.GridItemBrandedLogo>}
                 <FooterInfo
                   textDirection={newTabData.textDirection}
+                  currentDate={this.state.currentDate}
                   backgroundImageInfo={newTabData.backgroundWallpaper}
-                  showPhotoInfo={!isShowingBrandedWallpaper && hasWallpaperInfo && newTabData.showBackgroundImage}
+                  showPhotoInfo={false}
+                  showLiturgicalInfo={usesLiturgicalTheme}
                   onClickSettings={this.openSettings}
                 />
               </Page.FooterContent>

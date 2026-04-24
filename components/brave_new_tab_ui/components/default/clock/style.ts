@@ -11,6 +11,9 @@ export const StyledClock = styled('div')<{}>`
   line-height: 1;
   user-select: none;
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
   -webkit-font-smoothing: antialiased;
   font-family: ${p => p.theme.fontFamily.heading};
 `
@@ -21,6 +24,53 @@ export const StyledTime = styled('span')<{}>`
   font-weight: 300;
   color: inherit;
   display: inline-flex;
+`
+
+export const StyledClockMeta = styled('div')<{}>`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+`
+
+export const StyledDateRow = styled('div')<{}>`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+`
+
+export const StyledDate = styled('span')<{}>`
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+`
+
+export const StyledFeastBadge = styled('span')<{}>`
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--override-readability-color, #ffffff) 15%, transparent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+`
+
+export const StyledCelebration = styled('span')<{}>`
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  max-width: 28ch;
+  text-align: right;
+`
+
+export const StyledSeason = styled('span')<{}>`
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.8;
+  letter-spacing: 0.03em;
 `
 
 export const StyledTimeSeparator = styled('span')<{}>`

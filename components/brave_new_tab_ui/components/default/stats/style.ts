@@ -56,7 +56,7 @@ export const StyledStatsItemText = styled('span')<{}>`
 export const StyledStatsItemDescription = styled('div')<{}>`
   font-size: 16px;
   font-weight: 500;
-  color: var(--override-readability-color-rgb, #FFFFFF);
+  color: var(--override-readability-color, #FFFFFF);
   margin-top: 8px;
   font-family: ${p => p.theme.fontFamily.heading};
 `

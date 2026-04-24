@@ -32,6 +32,7 @@
 #include "brave/components/email_aliases/buildflags/buildflags.h"
 #include "brave/components/tor/buildflags/buildflags.h"
 #include "brave/grit/brave_theme_resources.h"
+#include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/autocomplete/chrome_autocomplete_provider_client.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
@@ -42,6 +43,7 @@
 #include "components/omnibox/browser/autocomplete_classifier.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_match_type.h"
+#include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/security_principal.h"
 #include "content/public/browser/web_contents.h"
 #include "net/base/filename_util.h"
@@ -84,6 +86,226 @@
 #endif
 
 namespace {
+
+constexpr char kArchivePageScript[] = R"JS(
+(() => {
+  const archiveDate = new Date();
+
+  function safeFileName(value) {
+    const fallback = location.hostname || 'webpage';
+    return (value || fallback)
+      .normalize('NFKD')
+      .replace(/[^\w.-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 90) || fallback;
+  }
+
+  function fileStamp() {
+    return archiveDate.toISOString().replace(/[:.]/g, '-');
+  }
+
+  function doctype() {
+    const type = document.doctype;
+    if (!type) {
+      return '<!DOCTYPE html>';
+    }
+
+    let value = '<!DOCTYPE ' + type.name;
+    if (type.publicId) {
+      value += ' PUBLIC "' + type.publicId + '"';
+    }
+    if (type.systemId) {
+      value += ' "' + type.systemId + '"';
+    }
+    return value + '>';
+  }
+
+  function ensureHead(root) {
+    let head = root.querySelector('head');
+    if (!head) {
+      head = document.createElement('head');
+      root.insertBefore(head, root.firstChild);
+    }
+    return head;
+  }
+
+  function addArchiveMetadata(head, kind) {
+    const charset = document.createElement('meta');
+    charset.setAttribute('charset', 'utf-8');
+    head.prepend(charset);
+
+    const base = document.createElement('base');
+    base.href = location.href;
+    charset.after(base);
+
+    const source = document.createElement('meta');
+    source.name = 'benedict-archive-source';
+    source.content = location.href;
+    head.appendChild(source);
+
+    const archivedAt = document.createElement('meta');
+    archivedAt.name = 'benedict-archive-created-at';
+    archivedAt.content = archiveDate.toISOString();
+    head.appendChild(archivedAt);
+
+    const archiveKind = document.createElement('meta');
+    archiveKind.name = 'benedict-archive-kind';
+    archiveKind.content = kind;
+    head.appendChild(archiveKind);
+  }
+
+  function downloadHtml(html, kind) {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = safeFileName(document.title) + '-' + kind + '-' +
+      fileStamp() + '.html';
+    link.style.display = 'none';
+    document.documentElement.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+      link.remove();
+    }, 0);
+  }
+
+  const root = document.documentElement.cloneNode(true);
+  root.querySelectorAll('script').forEach((script) => script.remove());
+  addArchiveMetadata(ensureHead(root), 'page');
+  downloadHtml(doctype() + '\n' + root.outerHTML, 'page');
+})();
+)JS";
+
+constexpr char kArchiveSelectionScript[] = R"JS(
+(() => {
+  const archiveDate = new Date();
+
+  function safeFileName(value) {
+    const fallback = location.hostname || 'selection';
+    return (value || fallback)
+      .normalize('NFKD')
+      .replace(/[^\w.-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 90) || fallback;
+  }
+
+  function fileStamp() {
+    return archiveDate.toISOString().replace(/[:.]/g, '-');
+  }
+
+  function appendStyles(head) {
+    document.querySelectorAll('link[rel~="stylesheet"], style').forEach(
+      (node) => head.appendChild(node.cloneNode(true)));
+  }
+
+  function selectedTextControlFragment() {
+    const active = document.activeElement;
+    if (!active || typeof active.selectionStart !== 'number' ||
+        typeof active.selectionEnd !== 'number' ||
+        active.selectionEnd <= active.selectionStart) {
+      return null;
+    }
+
+    const text = active.value.substring(active.selectionStart,
+                                        active.selectionEnd);
+    if (!text.trim()) {
+      return null;
+    }
+
+    const pre = document.createElement('pre');
+    pre.textContent = text;
+    return pre;
+  }
+
+  function selectedRangeFragment() {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 ||
+        !selection.toString().trim()) {
+      return null;
+    }
+
+    const article = document.createElement('article');
+    for (let i = 0; i < selection.rangeCount; ++i) {
+      article.appendChild(selection.getRangeAt(i).cloneContents());
+    }
+    return article.childNodes.length ? article : null;
+  }
+
+  function selectedFragment() {
+    return selectedTextControlFragment() || selectedRangeFragment();
+  }
+
+  function downloadHtml(html) {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = safeFileName(document.title) + '-selection-' +
+      fileStamp() + '.html';
+    link.style.display = 'none';
+    document.documentElement.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+      link.remove();
+    }, 0);
+  }
+
+  const fragment = selectedFragment();
+  if (!fragment) {
+    return;
+  }
+
+  const html = document.implementation.createHTMLDocument(
+      'Archived selection - ' + (document.title || location.href));
+  const charset = html.createElement('meta');
+  charset.setAttribute('charset', 'utf-8');
+  html.head.prepend(charset);
+
+  const base = html.createElement('base');
+  base.href = location.href;
+  charset.after(base);
+
+  const source = html.createElement('meta');
+  source.name = 'benedict-archive-source';
+  source.content = location.href;
+  html.head.appendChild(source);
+
+  const archivedAt = html.createElement('meta');
+  archivedAt.name = 'benedict-archive-created-at';
+  archivedAt.content = archiveDate.toISOString();
+  html.head.appendChild(archivedAt);
+
+  const archiveKind = html.createElement('meta');
+  archiveKind.name = 'benedict-archive-kind';
+  archiveKind.content = 'selection';
+  html.head.appendChild(archiveKind);
+
+  appendStyles(html.head);
+
+  const metadata = html.createElement('header');
+  metadata.style.cssText =
+      'font: 13px system-ui, sans-serif; margin: 0 0 24px; ' +
+      'padding: 12px; border-bottom: 1px solid #ddd; color: #444;';
+
+  const title = html.createElement('div');
+  title.textContent = document.title || location.href;
+  metadata.appendChild(title);
+
+  const sourceUrl = html.createElement('a');
+  sourceUrl.href = location.href;
+  sourceUrl.textContent = location.href;
+  metadata.appendChild(sourceUrl);
+
+  const created = html.createElement('div');
+  created.textContent = archiveDate.toLocaleString();
+  metadata.appendChild(created);
+
+  html.body.appendChild(metadata);
+  html.body.appendChild(html.importNode(fragment, true));
+
+  downloadHtml('<!DOCTYPE html>\n' + html.documentElement.outerHTML);
+})();
+)JS";
 
 AutocompleteMatch GetAutocompleteMatchForText(Profile* profile,
                                               const std::u16string& text) {
@@ -348,6 +570,9 @@ bool RenderViewContextMenu::IsCommandIdEnabled(int id) const {
     case IDC_COPY_CLEAN_LINK:
       return params_.link_url.is_valid() ||
              GetSelectedURL(GetProfile(), params_.selection_text).has_value();
+    case IDC_CONTENT_CONTEXT_ARCHIVE_PAGE:
+    case IDC_CONTENT_CONTEXT_ARCHIVE_SELECTION:
+      return IsArchiveCommandEnabled();
     case IDC_CONTENT_CONTEXT_FORCE_PASTE:
       // only enable if there is plain text data to paste - this is what
       // IsPasteAndMatchStyleEnabled checks internally, but IsPasteEnabled
@@ -446,6 +671,12 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       ExecuteAIChatCommand(id);
       break;
 #endif  // BUILDFLAG(ENABLE_AI_CHAT)
+    case IDC_CONTENT_CONTEXT_ARCHIVE_PAGE:
+      ExecuteArchivePageCommand();
+      break;
+    case IDC_CONTENT_CONTEXT_ARCHIVE_SELECTION:
+      ExecuteArchiveSelectionCommand();
+      break;
     case IDC_ADBLOCK_CONTEXT_BLOCK_ELEMENTS:
       cosmetic_filters::CosmeticFiltersTabHelper::LaunchContentPicker(
           source_web_contents_);
@@ -634,6 +865,86 @@ void RenderViewContextMenu::BuildAIChatMenu() {
       IDS_AI_CHAT_CONTEXT_LEO_TOOLS, &ai_chat_submenu_model_);
 }
 #endif  // BUILDFLAG(ENABLE_AI_CHAT)
+
+bool RenderViewContextMenu::IsArchiveCommandEnabled() const {
+  if (!source_web_contents_) {
+    return false;
+  }
+
+  const GURL& page_url = params_.page_url.is_valid()
+                             ? params_.page_url
+                             : source_web_contents_->GetLastCommittedURL();
+  return page_url.SchemeIsHTTPOrHTTPS() || page_url.SchemeIsFile();
+}
+
+void RenderViewContextMenu::ExecuteArchivePageCommand() {
+  if (!source_web_contents_) {
+    return;
+  }
+
+  content::RenderFrameHost* frame = source_web_contents_->GetPrimaryMainFrame();
+  if (!frame) {
+    return;
+  }
+
+  content::RenderFrameHost::AllowInjectingJavaScript();
+  frame->ExecuteJavaScript(base::UTF8ToUTF16(kArchivePageScript),
+                           base::NullCallback());
+}
+
+void RenderViewContextMenu::ExecuteArchiveSelectionCommand() {
+  content::RenderFrameHost* frame = GetRenderFrameHost();
+  if (!frame) {
+    return;
+  }
+
+  content::RenderFrameHost::AllowInjectingJavaScript();
+  frame->ExecuteJavaScript(base::UTF8ToUTF16(kArchiveSelectionScript),
+                           base::NullCallback());
+}
+
+void RenderViewContextMenu::BuildArchiveMenu() {
+  if (!IsArchiveCommandEnabled()) {
+    return;
+  }
+
+  if (!params_.selection_text.empty()) {
+    std::optional<size_t> copy_index =
+        menu_model_.GetIndexOfCommandId(IDC_CONTENT_CONTEXT_COPY);
+    if (!copy_index.has_value()) {
+      return;
+    }
+
+    std::optional<size_t> clean_link_index =
+        menu_model_.GetIndexOfCommandId(IDC_COPY_CLEAN_LINK);
+    menu_model_.InsertItemWithStringIdAt(
+        clean_link_index.value_or(copy_index.value()) + 1,
+        IDC_CONTENT_CONTEXT_ARCHIVE_SELECTION,
+        IDS_CONTENT_CONTEXT_ARCHIVE_SELECTION);
+    return;
+  }
+
+  std::optional<size_t> save_index =
+      menu_model_.GetIndexOfCommandId(IDC_SAVE_PAGE);
+  if (save_index.has_value()) {
+    menu_model_.InsertItemWithStringIdAt(*save_index,
+                                         IDC_CONTENT_CONTEXT_ARCHIVE_PAGE,
+                                         IDS_CONTENT_CONTEXT_ARCHIVE_PAGE);
+    return;
+  }
+
+  std::optional<size_t> print_index =
+      menu_model_.GetIndexOfCommandId(IDC_PRINT);
+  if (print_index.has_value()) {
+    menu_model_.InsertItemWithStringIdAt(*print_index,
+                                         IDC_CONTENT_CONTEXT_ARCHIVE_PAGE,
+                                         IDS_CONTENT_CONTEXT_ARCHIVE_PAGE);
+    return;
+  }
+
+  menu_model_.AddItemWithStringId(IDC_CONTENT_CONTEXT_ARCHIVE_PAGE,
+                                  IDS_CONTENT_CONTEXT_ARCHIVE_PAGE);
+}
 
 #if BUILDFLAG(ENABLE_CONTAINERS)
 void RenderViewContextMenu::BuildContainersMenu() {
@@ -860,6 +1171,8 @@ void RenderViewContextMenu::InitMenu() {
           copy_index.value() + 1, IDC_COPY_CLEAN_LINK, IDS_COPY_CLEAN_LINK);
     }
   }
+
+  BuildArchiveMenu();
 
 #if BUILDFLAG(ENABLE_AI_CHAT)
   BuildAIChatMenu();
