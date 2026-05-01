@@ -3,20 +3,31 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at https://mozilla.org/MPL/2.0/.
 
+import("//ios/web/public/js_messaging/optimize_ts.gni")
+
 source_set("brave_shields") {
   sources = [
     "brave_shields_settings_service_factory.h",
     "brave_shields_settings_service_factory.mm",
     "brave_shields_settings_service_factory_bridge.h",
     "brave_shields_settings_service_factory_bridge.mm",
+    "farbling_args.h",
+    "farbling_args.mm",
+    "farbling_javascript_feature.h",
+    "farbling_javascript_feature.mm",
   ]
 
   deps = [
-    "//base",
+    ":farbling_js",
     "//brave/components/brave_shields/core/browser",
+    "//brave/components/brave_shields/core/common",
+    "//brave/components/brave_shields/core/common:mojom",
     "//brave/components/brave_shields/ios/browser",
     "//brave/ios/browser/api/profile",
     "//brave/ios/browser/keyed_service",
+    "//brave/ios/web/js_messaging:randomized_message_handler_name",
+    "//brave/ios/web/js_messaging:message_handler_token",
+    "//components/content_settings/core/browser",
     "//components/keyed_service/core",
     "//components/user_prefs",
     "//ios/chrome/browser/content_settings/model",
@@ -24,8 +35,34 @@ source_set("brave_shields") {
     "//ios/chrome/browser/shared/model/profile",
     "//ios/chrome/browser/shared/model/profile:profile_keyed_service_factory",
     "//ios/web/public",
+    "//third_party/abseil-cpp:absl",
     "//url",
   ]
 
+  public_deps = [
+    "//base",
+    "//ios/web/public/js_messaging",
+  ]
+
   frameworks = [ "Foundation.framework" ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+
+  sources = [ "farbling_args_unittest.mm" ]
+
+  deps = [
+    ":brave_shields",
+    "//base",
+    "//base/test:test_support",
+    "//brave/components/brave_shields/core/common",
+    "//testing/gtest",
+  ]
+}
+
+optimize_ts("farbling_js") {
+  visibility = [ ":brave_shields" ]
+  sources = [ "resources/farbling.ts" ]
+  deps = [ "//brave/ios/web/js_messaging:util_scripts" ]
 }
