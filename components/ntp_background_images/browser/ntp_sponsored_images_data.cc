@@ -9,7 +9,9 @@
 #include "base/debug/crash_logging.h"
 #include "base/debug/dump_without_crashing.h"
 #include "base/files/file_path.h"
+#include "base/files/file_util.h"
 #include "base/logging.h"
+#include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "base/uuid.h"
 #include "brave/components/brave_ads/buildflags/buildflags.h"
@@ -262,7 +264,113 @@ std::optional<Campaign> MaybeParseCampaign(
   return campaign;
 }
 
+bool IsCreativeValid(const base::DictValue& dict,
+                     const base::FilePath& installed_dir) {
+  const base::DictValue* const wallpaper = dict.FindDict(kWallpaperKey);
+  if (!wallpaper) {
+    return true;
+  }
+
+  const std::string* const wallpaper_type =
+      wallpaper->FindString(kWallpaperTypeKey);
+  if (!wallpaper_type || *wallpaper_type != kRichMediaWallpaperType) {
+    return true;
+  }
+
+  const std::string* const relative_url =
+      wallpaper->FindString(kRichMediaWallpaperRelativeUrlKey);
+  if (!relative_url ||
+      base::FilePath::FromUTF8Unsafe(*relative_url).ReferencesParent() ||
+      base::PathExists(installed_dir.AppendASCII(*relative_url))) {
+    return true;
+  }
+
+  SCOPED_CRASH_KEY_STRING64("Issue55874", "component_id",
+                            installed_dir.DirName().BaseName().AsUTF8Unsafe());
+  SCOPED_CRASH_KEY_STRING64("Issue55874", "component_version",
+                            installed_dir.BaseName().AsUTF8Unsafe());
+  if (const std::string* const creative_instance_id =
+          dict.FindString(kCreativeInstanceIdKey)) {
+    SCOPED_CRASH_KEY_STRING64("Issue55874", "creative_instance_id",
+                              *creative_instance_id);
+  }
+  SCOPED_CRASH_KEY_STRING64("Issue55874", "relative_url", *relative_url);
+  SCOPED_CRASH_KEY_STRING64(
+      "Issue55874", "failure_reason",
+      "Creative file is missing when the component loads");
+  DUMP_WILL_BE_NOTREACHED();
+  return false;
+}
+
+void FilterCreativeSet(base::DictValue& dict,
+                       const base::FilePath& installed_dir) {
+  base::ListValue* const creative_list = dict.FindList(kCreativesKey);
+  if (!creative_list) {
+    return;
+  }
+
+  creative_list->EraseIf([&](const base::Value& creative_value) {
+    const base::DictValue* const creative_dict = creative_value.GetIfDict();
+    return !creative_dict || !IsCreativeValid(*creative_dict, installed_dir);
+  });
+}
+
 }  // namespace
+
+void FilterCampaigns(base::DictValue& dict,
+                     const base::FilePath& installed_dir) {
+  base::ListValue* const list = dict.FindList(kCampaignsKey);
+  if (!list) {
+    return;
+  }
+
+  for (auto& campaign_value : *list) {
+    base::DictValue* const campaign_dict = campaign_value.GetIfDict();
+    if (!campaign_dict) {
+      continue;
+    }
+
+    const std::string* const campaign_id =
+        campaign_dict->FindString(kCampaignIdKey);
+    if (!campaign_id || campaign_id->empty()) {
+      continue;
+    }
+
+    base::ListValue* const creative_set_list =
+        campaign_dict->FindList(kCreativeSetsKey);
+    if (!creative_set_list) {
+      continue;
+    }
+
+    for (auto& creative_set_value : *creative_set_list) {
+      if (base::DictValue* const creative_set_dict =
+              creative_set_value.GetIfDict()) {
+        FilterCreativeSet(*creative_set_dict, installed_dir);
+      }
+    }
+
+    creative_set_list->EraseIf([](const base::Value& creative_set_value) {
+      const base::DictValue* const creative_set_dict =
+          creative_set_value.GetIfDict();
+      if (!creative_set_dict) {
+        return true;
+      }
+      const base::ListValue* const creative_list =
+          creative_set_dict->FindList(kCreativesKey);
+      return !creative_list || creative_list->empty();
+    });
+  }
+
+  list->EraseIf([](const base::Value& campaign_value) {
+    const base::DictValue* const campaign_dict = campaign_value.GetIfDict();
+    if (!campaign_dict) {
+      return true;
+    }
+    const base::ListValue* const creative_set_list =
+        campaign_dict->FindList(kCreativeSetsKey);
+    return !creative_set_list || creative_set_list->empty();
+  });
+}
 
 Logo::Logo() = default;
 
