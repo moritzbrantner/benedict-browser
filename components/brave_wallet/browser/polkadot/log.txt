@@ -1,0 +1,266 @@
+[18544:37912:0604/132231.910:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_signed_transfer_task.cc:55] Starting transaction signing task now!
+[18544:37912:0604/132232.090:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "state_queryStorageAt",
+   "params": [ [ "0x26AA394EEA5630E07C48AE0C9558CEF7B99D880EC681799C0CF30E8886371DA96F72E0A390DB2406281323AC697D46F10E161E17289C260A07020CC2A23192E882D5BEE006B1390DEED844B881B7E71E" ] ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": [ {
+      "block": "0x8c0e4bf9ae20618e8a08bd8af389746ce5d1b7ca93c45137bf0849a32cd4a2a6",
+      "changes": [ [ "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da96f72e0a390db2406281323ac697d46f10e161e17289c260a07020cc2a23192e882d5bee006b1390deed844b881b7e71e", "0x020000000000000001000000000000008853c430f82c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080" ] ]
+   } ]
+}
+
+[18544:37912:0604/132232.090:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getHeader",
+   "params": [  ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+      "digest": {
+         "logs": [ "0x06434d4c53100100010c", "0x066175726120e027d80800000000", "0x0452505352907e9e22dbb0797cd8fbcedcccf71b5fd97b20c2eeb55b00b31f2380dc3742e49f8a0dda02", "0x056175726101012e29390482b382dbc41c79b95ae6799525fe24e4176f45af23c7757290932719c56b2685d943e41338e8d2a229b0c88e42a74d46edf72d31b576df65a3b5a68c" ]
+      },
+      "extrinsicsRoot": "0xe735e1f7705e8b73bcf08883f548dc33d005c4cd1ea552f407b159f4967e9c90",
+      "number": "0x93c1ab",
+      "parentHash": "0xc3da0f76ab484260860d32dab28fb96f6b9a01b7c378587bebe37da88bb7f268",
+      "stateRoot": "0x7933dd8574a4ea56530fade14d1c8bbe7f7c0623ca680136fb744cb56e643d27"
+   }
+}
+
+[18544:37912:0604/132232.090:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getFinalizedHead",
+   "params": [  ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": "0x5ebbd2cbdec4a87c6aebbf7cd2b9a7c741a3892042239683d1339e5cb5c51030"
+}
+
+[18544:37912:0604/132232.090:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getBlockHash",
+   "params": [ "00000000" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2"
+}
+
+[18544:37912:0604/132232.262:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getHeader",
+   "params": [ "c3da0f76ab484260860d32dab28fb96f6b9a01b7c378587bebe37da88bb7f268" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+      "digest": {
+         "logs": [ "0x06434d4c53100102010c", "0x066175726120df27d80800000000", "0x045250535290ea71edfd042b8e785b19992e9e4cf909b6d579bc4bb06899c4423c96eb1de4fa860dda02", "0x056175726101017a8f4bc21a16aebd2c9356b74eb70782efa0e5a4ef39c8db0793014da7a004217b892dd3cb2287fbe325a6cd814fdd88f67d522ad683a94fd32f527a745ce981" ]
+      },
+      "extrinsicsRoot": "0x223ed4bb448aeb4316f209971831649e795ce2081f4a3d5aeee1dc402357f3c2",
+      "number": "0x93c1aa",
+      "parentHash": "0x7fb4271ef28fcdd41a2f7c323124997646c416aeb54eb00123017456e59d4bfd",
+      "stateRoot": "0x0c5619e980ac1cd9615cf70513a8649b42ca455e0385f17ffb4f211a1776ea03"
+   }
+}
+
+[18544:37912:0604/132232.262:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getHeader",
+   "params": [ "5ebbd2cbdec4a87c6aebbf7cd2b9a7c741a3892042239683d1339e5cb5c51030" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+      "digest": {
+         "logs": [ "0x06434d4c53100101010c", "0x066175726120dd27d80800000000", "0x04525053529072594c48ad73e5e51fb627989f0823c09726f7cc409fff88d4430d1d673f6742760dda02", "0x056175726101010697df3a452d69a5ae1e44b2735fe6dc89f10cc5874945eb43695bfd1bb9764d9c64d93d3e2713f4e256c75fa783dde9b5ffca6d78c77a8d72815024ce68f58d" ]
+      },
+      "extrinsicsRoot": "0x0e192696fb0680a1b32689366a25a53b10c17d9dedd809181afabf3765664b4c",
+      "number": "0x93c19d",
+      "parentHash": "0xabc580f64cc965fa859ef51df3c21fa566933b5ac660b0f3d95d74df0a9e7ac0",
+      "stateRoot": "0xaace0e25124cd75b35cb6adf09d0235d840bca97c210c96c92528b789bdb6669"
+   }
+}
+
+[18544:37912:0604/132232.435:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "state_getRuntimeVersion",
+   "params": [ "7fb4271ef28fcdd41a2f7c323124997646c416aeb54eb00123017456e59d4bfd" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+      "apis": [ [ "0xf78b278be53f454c", 2 ], [ "0xfbc577b9d747efd6", 1 ], [ "0xc51ff1fa3f5d0cca", 1 ], [ "0x8c403e5c4a9fd442", 1 ], [ "0x91b1c8b16328eb92", 2 ], [ "0x6ff52ee858e6c5bd", 2 ], [ "0x9ffb505aa738d69c", 1 ], [ "0x2609be83ac4468dc", 1 ], [ "0xdf6acb689907609b", 5 ], [ "0x04e70521a0d3d2f8", 1 ], [ "0xd2bc9897eed08f15", 3 ], [ "0x40fe3ad401f8959a", 6 ], [ "0x37c8bb1350a9a2a8", 4 ], [ "0xd7bdd8a272ca0d65", 2 ], [ "0xf3ff14d5ab527059", 3 ], [ "0xdd718d5cc53262d4", 1 ], [ "0xde92b8a0426b9bf6", 2 ], [ "0x18ef58a3b67ba770", 1 ], [ "0xab3c0572291feb8b", 2 ], [ "0xa2ddb6a58477bf63", 1 ], [ "0xea93e3f16f3d6962", 3 ], [ "0x12c8e3d4d7e06de0", 1 ], [ "0x37e397fc7c91f5e4", 2 ], [ "0xbc9d89904f5b923f", 1 ], [ "0x17a6bc0d0062aeb3", 1 ], [ "0xccd9de6396c899ca", 1 ], [ "0x8a8047a53a8277ec", 1 ] ],
+      "authoringVersion": 1,
+      "implName": "asset-hub-paseo",
+      "implVersion": 0,
+      "specName": "asset-hub-paseo",
+      "specVersion": 2002002,
+      "stateVersion": 1,
+      "systemVersion": 1,
+      "transactionVersion": 15
+   }
+}
+
+[18544:37912:0604/132232.616:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "author_submitExtrinsic",
+   "params": [ "490284000e161e17289c260a07020cc2a23192e882d5bee006b1390deed844b881b7e71e0136eef01ae13c4a7e7edf0d051e5da1a3619a70a14d32af4b4efa12624800bd48443c02fe3b15c8193510e75abd3034ffdf266f803eb4952cd35cf5a4972b9c85a502080000000a0300ae70948d0c015b6c2b1ac46b8931ad6301f2c648f3f0adf71d08a68fe745561e0700c12a9b64" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": "0xec9e1043a7dd8f045c86f6058d356193dd654c068126647a89ac5a92696fa5bb"
+}
+
+[18544:37912:0604/132232.794:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getFinalizedHead",
+   "params": [  ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": "0x5ebbd2cbdec4a87c6aebbf7cd2b9a7c741a3892042239683d1339e5cb5c51030"
+}
+
+[18544:37912:0604/132232.965:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://asset-hub-paseo-rpc.n.dwellir.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "chain_getHeader",
+   "params": [ "5ebbd2cbdec4a87c6aebbf7cd2b9a7c741a3892042239683d1339e5cb5c51030" ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+      "digest": {
+         "logs": [ "0x06434d4c53100101010c", "0x066175726120dd27d80800000000", "0x04525053529072594c48ad73e5e51fb627989f0823c09726f7cc409fff88d4430d1d673f6742760dda02", "0x056175726101010697df3a452d69a5ae1e44b2735fe6dc89f10cc5874945eb43695bfd1bb9764d9c64d93d3e2713f4e256c75fa783dde9b5ffca6d78c77a8d72815024ce68f58d" ]
+      },
+      "extrinsicsRoot": "0x0e192696fb0680a1b32689366a25a53b10c17d9dedd809181afabf3765664b4c",
+      "number": "0x93c19d",
+      "parentHash": "0xabc580f64cc965fa859ef51df3c21fa566933b5ac660b0f3d95d74df0a9e7ac0",
+      "stateRoot": "0xaace0e25124cd75b35cb6adf09d0235d840bca97c210c96c92528b789bdb6669"
+   }
+}
+
+[18544:37912:0604/132236.104:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://polkadot-asset-hub.wallet.brave.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "state_queryStorageAt",
+   "params": [ [ "0x26AA394EEA5630E07C48AE0C9558CEF7B99D880EC681799C0CF30E8886371DA96F72E0A390DB2406281323AC697D46F10E161E17289C260A07020CC2A23192E882D5BEE006B1390DEED844B881B7E71E" ] ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": [ {
+      "block": "0x67d8757b49fdb3088d9628d14bb75dd48bcefa7b66f85cc93d83747bcaebc740",
+      "changes": [ [ "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da96f72e0a390db2406281323ac697d46f10e161e17289c260a07020cc2a23192e882d5bee006b1390deed844b881b7e71e", "0x020000000000000001000000000000007a07fc52020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080" ] ]
+   } ]
+}
+
+[18544:37912:0604/132236.138:INFO:brave\components\brave_wallet\browser\polkadot\polkadot_substrate_rpc.cc:873] [polkadot-rpc]:
+url: https://polkadot-mainnet.wallet.brave.com/
+request: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "method": "state_queryStorageAt",
+   "params": [ [ "0x26AA394EEA5630E07C48AE0C9558CEF7B99D880EC681799C0CF30E8886371DA96F72E0A390DB2406281323AC697D46F10E161E17289C260A07020CC2A23192E882D5BEE006B1390DEED844B881B7E71E" ] ]
+}
+
+response: {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": [ {
+      "block": "0x8676b5ac4416ccbbe0199ab312977560fbdcacada1d8f86e0747b273ecc97cf6",
+      "changes": [ [ "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da96f72e0a390db2406281323ac697d46f10e161e17289c260a07020cc2a23192e882d5bee006b1390deed844b881b7e71e", null ] ]
+   } ]
+}
+
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.038:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.039:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132239.039:INFO:CONSOLE:1] "Uncaught Error: Minified React error #423; visit https://reactjs.org/docs/error-decoder.html?invariant=423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.452:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.452:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.453:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.453:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.454:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.454:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.455:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132242.455:INFO:CONSOLE:1] "Uncaught Error: Minified React error #423; visit https://reactjs.org/docs/error-decoder.html?invariant=423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.607:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.607:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.607:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.608:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.608:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.608:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.609:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132244.609:INFO:CONSOLE:1] "Uncaught Error: Minified React error #423; visit https://reactjs.org/docs/error-decoder.html?invariant=423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.479:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.480:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #418; visit https://reactjs.org/docs/error-decoder.html?invariant=418 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+[18544:37912:0604/132246.481:INFO:CONSOLE:1] "Uncaught Error: Minified React error #423; visit https://reactjs.org/docs/error-decoder.html?invariant=423 for the full message or use the non-minified dev environment for full errors and additional helpful warnings.", source: https://static.subscan.io/_next/static/chunks/framework-a55cb4ebcf0f563a.js (1)
+
+D:\brave-browser\src\brave>

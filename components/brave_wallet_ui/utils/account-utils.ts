@@ -192,7 +192,12 @@ export const keyringIdForNewAccount = (
     if (chainId === BraveWallet.POLKADOT_MAINNET) {
       return BraveWallet.KeyringId.kPolkadotMainnet
     }
-    if (chainId === BraveWallet.POLKADOT_TESTNET) {
+    if (
+      [
+        BraveWallet.POLKADOT_TESTNET,
+        BraveWallet.POLKADOT_PASEO_ASSET_HUB,
+      ].includes(chainId)
+    ) {
       return BraveWallet.KeyringId.kPolkadotTestnet
     }
   }
