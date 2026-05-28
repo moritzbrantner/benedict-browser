@@ -11,7 +11,6 @@
 #include "base/check_deref.h"
 #include "base/functional/bind.h"
 #include "base/types/expected.h"
-#include "brave/components/brave_account/brave_account_service_constants.h"
 #include "brave/components/brave_account/brave_account_utils.h"
 #include "brave/components/brave_account/endpoint_client/with_headers.h"
 #include "brave/components/brave_account/state_internal.h"
@@ -118,6 +117,33 @@ void LoggedOutState::RegisterVerify(const std::string& code,
                      weak_factory_.GetWeakPtr(), std::move(callback)));
 }
 
+void LoggedOutState::ResetPasswordVerifyInit(
+    mojom::Service initiating_service,
+    const std::string& email,
+    ResetPasswordVerifyInitCallback callback) {
+  reset_password_.VerifyInit(initiating_service, email, std::move(callback));
+}
+
+void LoggedOutState::ResetPasswordVerifyComplete(
+    const std::string& code,
+    ResetPasswordVerifyCompleteCallback callback) {
+  reset_password_.VerifyComplete(code, std::move(callback));
+}
+
+void LoggedOutState::ResetPasswordPasswordInit(
+    mojom::Service initiating_service,
+    const std::string& blinded_message,
+    ResetPasswordPasswordInitCallback callback) {
+  reset_password_.PasswordInit(initiating_service, blinded_message,
+                               std::move(callback));
+}
+
+void LoggedOutState::ResetPasswordPasswordFinalize(
+    const std::string& serialized_record,
+    ResetPasswordPasswordFinalizeCallback callback) {
+  reset_password_.PasswordFinalize(serialized_record, std::move(callback));
+}
+
 void LoggedOutState::LoginInitialize(mojom::Service initiating_service,
                                      const std::string& email,
                                      const std::string& serialized_ke1,
@@ -184,7 +210,8 @@ void LoggedOutState::OnRegisterInitialize(RegisterInitializeCallback callback,
           .and_then([&](auto success_body)
                         -> base::expected<mojom::RegisterInitializeResultPtr,
                                           mojom::RegisterErrorPtr> {
-            if (success_body.verification_token.empty() ||
+            if (!success_body.verification_token ||
+                success_body.verification_token->empty() ||
                 success_body.serialized_response.empty()) {
               return base::unexpected(MakeServerError<mojom::RegisterError>(
                   status_code,
@@ -192,7 +219,7 @@ void LoggedOutState::OnRegisterInitialize(RegisterInitializeCallback callback,
             }
 
             std::string encrypted_verification_token =
-                Encrypt(success_body.verification_token);
+                Encrypt(*success_body.verification_token);
             if (encrypted_verification_token.empty()) {
               return base::unexpected(MakeClientError<mojom::RegisterError>(
                   mojom::RegisterClientErrorCode::
@@ -275,14 +302,15 @@ void LoggedOutState::OnRegisterVerify(RegisterVerifyCallback callback,
           .and_then([&](auto success_body)
                         -> base::expected<mojom::RegisterVerifyResultPtr,
                                           mojom::RegisterErrorPtr> {
-            if (success_body.auth_token.empty() || success_body.email.empty()) {
+            if (!success_body.auth_token.is_string() ||
+                success_body.auth_token.GetString().empty()) {
               return base::unexpected(MakeServerError<mojom::RegisterError>(
                   status_code,
                   mojom::RegisterServerErrorCode::kInvalidResponse));
             }
 
             if (encrypted_authentication_token =
-                    Encrypt(success_body.auth_token);
+                    Encrypt(success_body.auth_token.GetString());
                 encrypted_authentication_token.empty()) {
               return base::unexpected(MakeClientError<mojom::RegisterError>(
                   mojom::RegisterClientErrorCode::

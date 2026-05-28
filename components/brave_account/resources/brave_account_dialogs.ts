@@ -21,9 +21,13 @@ import {
   BraveAccountBrowserProxyImpl,
 } from './brave_account_browser_proxy.js'
 import { getHtml } from './brave_account_dialogs.html.js'
+import type { ResetPasswordVerifiedEventDetail } from './brave_account_otp_dialog.js'
 
 export type Dialog =
-  | { type: 'CREATE' | 'ENTRY' | 'FORGOT_PASSWORD' | 'SIGN_IN' }
+  | {
+      type: 'CREATE' | 'ENTRY' | 'FORGOT_PASSWORD' | 'SIGN_IN'
+    }
+  | { type: 'SET_NEW_PASSWORD'; email: string }
   | { type: 'OTP'; intent: VerificationIntent }
 
 export class BraveAccountDialogsElement extends CrLitElement {
@@ -49,6 +53,12 @@ export class BraveAccountDialogsElement extends CrLitElement {
     }
   }
 
+  protected onResetPasswordVerified(
+    e: CustomEvent<ResetPasswordVerifiedEventDetail>,
+  ) {
+    this.dialog = { type: 'SET_NEW_PASSWORD', email: e.detail.email }
+  }
+
   protected onCloseDialog() {
     this.browserProxy.closeDialog()
   }
@@ -67,6 +77,11 @@ export class BraveAccountDialogsElement extends CrLitElement {
 
     this.eventTracker.add(this, 'back-button-clicked', this.onBackButtonClicked)
     this.eventTracker.add(this, 'close-dialog', this.onCloseDialog)
+    this.eventTracker.add(
+      this,
+      'reset-password-verified',
+      this.onResetPasswordVerified,
+    )
     // <if expr="not is_android and not is_ios">
     this.eventTracker.add(document, 'keydown', this.onKeyDown)
     this.eventTracker.add(document, 'keyup', this.onKeyUp)
@@ -76,6 +91,9 @@ export class BraveAccountDialogsElement extends CrLitElement {
     // LOGGED_OUT (no verification): show the ENTRY dialog
     // LOGGED_OUT (with verification): show the OTP dialog
     // LOGGED_IN: close the native dialog
+    // Exception: if the user has already advanced past OTP into
+    // SET_NEW_PASSWORD locally (reset-password flow), keep that dialog —
+    // the underlying account state hasn't changed yet, but the renderer has.
     // Since account state is profile-wide, this automatically updates dialogs
     // across all tabs.
     this.accountStateListenerId =
@@ -84,12 +102,18 @@ export class BraveAccountDialogsElement extends CrLitElement {
           switch (whichAccountState(state)) {
             case AccountStateFieldTags.LOGGED_OUT: {
               const verification = state.loggedOut!.verification
-              this.dialog = verification
-                ? {
+              if (verification) {
+                // Keep SET_NEW_PASSWORD if the renderer already advanced past
+                // OTP locally (reset-password flow); otherwise show OTP.
+                if (this.dialog?.type !== 'SET_NEW_PASSWORD') {
+                  this.dialog = {
                     type: 'OTP',
                     intent: { loggedOutIntent: verification.intent },
                   }
-                : { type: 'ENTRY' }
+                }
+              } else {
+                this.dialog = { type: 'ENTRY' }
+              }
               break
             }
             case AccountStateFieldTags.LOGGED_IN:

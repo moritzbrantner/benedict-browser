@@ -71,6 +71,11 @@ class StateBase : public mojom::Authentication {
   StateBase(const StateBase&) = delete;
   StateBase& operator=(const StateBase&) = delete;
 
+  // `ResetPassword` is a helper owned by `LoggedOutState` that implements the
+  // password-reset flow on its owner's behalf, reaching the request/crypto
+  // helpers below through this back-reference.
+  friend class ResetPassword;
+
   void AddReceiver(mojo::PendingReceiver<mojom::Authentication> receiver);
 
   std::vector<mojo::PendingReceiver<mojom::Authentication>> TakeReceivers();
@@ -143,6 +148,24 @@ class StateBase : public mojom::Authentication {
       ResendVerificationEmailCallback callback) override;
 
   void CancelVerification(mojom::VerificationIntentPtr intent) override;
+
+  void ResetPasswordVerifyInit(
+      mojom::Service initiating_service,
+      const std::string& email,
+      ResetPasswordVerifyInitCallback callback) override;
+
+  void ResetPasswordVerifyComplete(
+      const std::string& code,
+      ResetPasswordVerifyCompleteCallback callback) override;
+
+  void ResetPasswordPasswordInit(
+      mojom::Service initiating_service,
+      const std::string& blinded_message,
+      ResetPasswordPasswordInitCallback callback) override;
+
+  void ResetPasswordPasswordFinalize(
+      const std::string& serialized_record,
+      ResetPasswordPasswordFinalizeCallback callback) override;
 
   void LoginInitialize(mojom::Service initiating_service,
                        const std::string& email,
