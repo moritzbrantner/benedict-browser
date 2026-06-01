@@ -42,6 +42,7 @@ group("ui_public_dependencies") {
   ]
   public_deps = [
     ":brave_tab_prefs",
+    "//brave/browser/ui/webui/history:mojom",
     "//brave/components/brave_wallet/common/buildflags",
     "//brave/components/brave_wayback_machine/buildflags",
     "//brave/components/containers/buildflags",
@@ -334,6 +335,10 @@ source_set("ui") {
       "webui/brave_shields/shields_panel_handler.h",
       "webui/brave_shields/shields_panel_ui.cc",
       "webui/brave_shields/shields_panel_ui.h",
+      "webui/history/brave_history_embeddings_page_handler.cc",
+      "webui/history/brave_history_embeddings_page_handler.h",
+      "webui/history/brave_history_ui.cc",
+      "webui/history/brave_history_ui.h",
       "webui/new_tab_page/brave_new_tab_message_handler.cc",
       "webui/new_tab_page/brave_new_tab_message_handler.h",
       "webui/new_tab_page/brave_new_tab_page_handler.cc",
@@ -418,6 +423,7 @@ source_set("ui") {
       "//brave/components/brave_wayback_machine/buildflags",
       "//brave/components/constants",
       "//brave/components/email_aliases/buildflags",
+      "//brave/components/local_ai/core",
       "//brave/components/misc_metrics",
       "//brave/components/sidebar/browser",
       "//brave/components/sidebar/common",
