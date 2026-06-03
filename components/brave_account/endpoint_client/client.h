@@ -118,6 +118,8 @@ class Client {
     auto* response_info = simple_url_loader.ResponseInfo();
     auto headers = response_info ? response_info->headers : nullptr;
 
+    DVLOG(0) << "URL: " << simple_url_loader.GetFinalURL();
+
     Response response(Response::Deserialize(simple_url_loader.NetError(),
                                             headers, std::move(response_body)));
     if constexpr (base::is_instantiation<Response, WithHeaders>) {

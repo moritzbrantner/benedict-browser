@@ -50,6 +50,8 @@ struct Response {
       return response;
     }
 
+    DVLOG(0) << "Response body: " << *response_body;
+
     if (network::IsSuccessfulStatus(*response.status_code)) {  // 2xx
       response.body = Deserialize<SuccessBody>(*response_body);
     } else {  // non-2xx
