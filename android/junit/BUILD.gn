@@ -210,7 +210,7 @@ if (is_android) {
 
     deps = [ "//chrome/android/junit:chrome_junit_tests_helper" ]
   }
-  
+
   robolectric_library(
       "brave_junit_tests_org.chromium.chrome.browser.fullscreen") {
     sources = [ "src/org/chromium/chrome/browser/fullscreen/BraveFullscreenHtmlApiHandlerBaseTest.java" ]
