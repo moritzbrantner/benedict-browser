@@ -147,6 +147,7 @@ void PlaylistExclusions::OnPlaylistExclusionsLoaded(
     bool valid) {
   rules_ = std::move(rules);
   is_ready_ = valid;
+  ++load_generation_;
 }
 
 bool PlaylistExclusions::CanResolvePageSrcLater(const GURL& url) const {

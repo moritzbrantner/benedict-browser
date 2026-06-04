@@ -6,6 +6,7 @@
 #ifndef BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSIONS_H_
 #define BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSIONS_H_
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -86,6 +87,7 @@ class PlaylistExclusions {
 
   std::vector<PlaylistResolveRule> rules_;
   bool is_ready_ = false;
+  uint64_t load_generation_ = 0;
   base::WeakPtrFactory<PlaylistExclusions> weak_factory_{this};
 };
 

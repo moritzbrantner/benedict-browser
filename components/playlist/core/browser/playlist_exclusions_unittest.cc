@@ -26,6 +26,13 @@ class PlaylistExclusionsUnitTest : public testing::Test {
     exclusions->weak_factory_.InvalidateWeakPtrs();
     exclusions->rules_.clear();
     exclusions->is_ready_ = false;
+    exclusions->load_generation_ = 0;
+  }
+
+  void WaitForLoadComplete(PlaylistExclusions* exclusions,
+                           uint64_t generation) {
+    ASSERT_TRUE(base::test::RunUntil(
+        [&]() { return exclusions->load_generation_ > generation; }));
   }
 
   base::test::TaskEnvironment task_environment_{
@@ -47,8 +54,9 @@ TEST_F(PlaylistExclusionsUnitTest, EmptyContentsNotReady) {
       temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
   ASSERT_TRUE(base::WriteFile(exclusions_file, ""));
 
+  const uint64_t generation = exclusions->load_generation_;
   exclusions->LoadPlaylistExclusions(exclusions_file);
-  task_environment_.RunUntilIdle();
+  WaitForLoadComplete(exclusions, generation);
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
@@ -61,8 +69,9 @@ TEST_F(PlaylistExclusionsUnitTest, InvalidJsonNotReady) {
       temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
   ASSERT_TRUE(base::WriteFile(exclusions_file, "{not valid json"));
 
+  const uint64_t generation = exclusions->load_generation_;
   exclusions->LoadPlaylistExclusions(exclusions_file);
-  task_environment_.RunUntilIdle();
+  WaitForLoadComplete(exclusions, generation);
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
@@ -75,8 +84,9 @@ TEST_F(PlaylistExclusionsUnitTest, MissingRulesListNotReady) {
       temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
   ASSERT_TRUE(base::WriteFile(exclusions_file, R"({"version": 1})"));
 
+  const uint64_t generation = exclusions->load_generation_;
   exclusions->LoadPlaylistExclusions(exclusions_file);
-  task_environment_.RunUntilIdle();
+  WaitForLoadComplete(exclusions, generation);
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
@@ -98,8 +108,10 @@ TEST_F(PlaylistExclusionsUnitTest, RulesBlockListedPaths) {
       temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
   ASSERT_TRUE(base::WriteFile(exclusions_file, kJson));
 
+  const uint64_t generation = exclusions->load_generation_;
   exclusions->LoadPlaylistExclusions(exclusions_file);
-  ASSERT_TRUE(base::test::RunUntil([&]() { return exclusions->is_ready_; }));
+  WaitForLoadComplete(exclusions, generation);
+  ASSERT_TRUE(exclusions->is_ready_);
 
   EXPECT_FALSE(
       exclusions->CanResolvePageSrcLater(GURL("https://youtube.com/")));
