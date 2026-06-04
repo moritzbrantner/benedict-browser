@@ -35,6 +35,7 @@ class SidebarBrowserTest;
 
 class BraveBrowser;
 class SidePanelEntry;
+class Browser;
 
 // This view is the parent view of all sidebar ui.
 // Direct child views are control view and panel view.
