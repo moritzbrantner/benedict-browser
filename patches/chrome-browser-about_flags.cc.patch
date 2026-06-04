@@ -1,8 +1,8 @@
 diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
-index a70fb5942810e6659fc0aabcf2c6fa3e8b85b267..5509f424654f74cca3bfdd16fcdecb350bf7937f 100644
+index d8742038933fe3cdaf866cb0a6eff9aa32698fb5..a7b8bdd95da0e8d0f8f7201092858700ba893bea 100644
 --- a/chrome/browser/about_flags.cc
 +++ b/chrome/browser/about_flags.cc
-@@ -4679,6 +4679,7 @@ const FeatureEntry::FeatureVariation kCanvasAccessibilityChoices[] = {
+@@ -4665,6 +4665,7 @@ const FeatureEntry::FeatureVariation kCanvasAccessibilityChoices[] = {
  //
  // When adding a new choice, add it to the end of the list.
  const FeatureEntry kFeatureEntries[] = {
