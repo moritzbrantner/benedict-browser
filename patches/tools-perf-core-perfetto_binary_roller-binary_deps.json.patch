@@ -1,13 +1,13 @@
 diff --git a/tools/perf/core/perfetto_binary_roller/binary_deps.json b/tools/perf/core/perfetto_binary_roller/binary_deps.json
-index b4a13e4afb540054c94fa5ec36ad7eb3c1a9918a..273f7c5f259c7a747b06bcb1f01b17cea1d61486 100644
+index 51bd9a293461a51cc422f7125eb67e08e9162209..5a0ac41a2863468e788f29fbe3e28058673a80a1 100644
 --- a/tools/perf/core/perfetto_binary_roller/binary_deps.json
 +++ b/tools/perf/core/perfetto_binary_roller/binary_deps.json
 @@ -5,8 +5,8 @@
              "full_remote_path": "perfetto-luci-artifacts/v52.0/linux-arm64/trace_processor_shell"
          },
          "win": {
--            "hash": "1bed178791795610b25e86bc75d7d06c20c93542",
--            "full_remote_path": "chromium-telemetry/perfetto_binaries/trace_processor_shell/win/8b65138050c38379e489e4a323e0472c08497449/trace_processor_shell.exe"
+-            "hash": "dd907b19cd1d4d37b162f43aa3de73f39837c593",
+-            "full_remote_path": "chromium-telemetry/perfetto_binaries/trace_processor_shell/win/a760e3fc2f84d84225bfb4928d281c4b7c51d193/trace_processor_shell.exe"
 +            "hash": "bbfdca9a518712ec83e4cec27407d02e1843e5b5",
 +            "full_remote_path": "chromium-telemetry/perfetto_binaries/trace_processor_shell/win/e2b82363b4c2a1912a6e33c9c6ae8a6561a35b93/trace_processor_shell.exe"
          },
