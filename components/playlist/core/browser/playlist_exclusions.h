@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSION_H_
-#define BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSION_H_
+#ifndef BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSIONS_H_
+#define BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSIONS_H_
 
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ class PlaylistExclusions {
 
   static PlaylistExclusions* GetInstance();
 
-  void OnComponentReady(const base::FilePath& component_dir);
+  void LoadPlaylistExclusions(const base::FilePath& exclusions_file_path);
 
   // Returns true when `url` may be used for LivePlaylist-style reload /
   // re-resolution. While the exclusions list is still loading or failed to
@@ -81,9 +81,9 @@ class PlaylistExclusions {
 
   PlaylistExclusions();
 
-  void OnPlaylistExclusionsLoaded(const std::string& contents);
+  void OnPlaylistExclusionsLoaded(std::vector<PlaylistResolveRule> rules,
+                                  bool valid);
 
-  base::FilePath component_path_;
   std::vector<PlaylistResolveRule> rules_;
   bool is_ready_ = false;
   base::WeakPtrFactory<PlaylistExclusions> weak_factory_{this};
@@ -91,4 +91,4 @@ class PlaylistExclusions {
 
 }  // namespace playlist
 
-#endif  // BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSION_H_
+#endif  // BRAVE_COMPONENTS_PLAYLIST_CORE_BROWSER_PLAYLIST_EXCLUSIONS_H_

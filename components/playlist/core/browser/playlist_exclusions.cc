@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "brave/components/playlist/core/browser/playlist_exclusion.h"
+#include "brave/components/playlist/core/browser/playlist_exclusions.h"
 
 #include <string_view>
 #include <utility>
@@ -13,7 +13,6 @@
 #include "base/task/thread_pool.h"
 #include "base/values.h"
 #include "brave/components/brave_component_updater/browser/dat_file_util.h"
-#include "brave/components/playlist/core/common/constants.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "url/gurl.h"
 
@@ -40,6 +39,47 @@ bool GetPathPrefixesFromValue(const base::Value* value,
     }
   }
   return true;
+}
+
+struct PlaylistExclusionsLoadResult {
+  std::vector<PlaylistResolveRule> rules;
+  bool valid = false;
+};
+
+PlaylistExclusionsLoadResult LoadPlaylistExclusionsFromFile(
+    const base::FilePath& exclusions_file_path) {
+  PlaylistExclusionsLoadResult result;
+  const std::string contents =
+      brave_component_updater::GetDATFileAsString(exclusions_file_path);
+  if (contents.empty()) {
+    return result;
+  }
+
+  std::optional<base::DictValue> root =
+      base::JSONReader::ReadDict(contents, base::JSON_PARSE_RFC);
+  if (!root) {
+    return result;
+  }
+
+  const base::ListValue* rules_list = root->FindList(kRules);
+  if (!rules_list) {
+    return result;
+  }
+
+  base::JSONValueConverter<PlaylistResolveRule> converter;
+  for (const base::Value& rule_val : *rules_list) {
+    PlaylistResolveRule rule;
+    if (!converter.Convert(rule_val, &rule)) {
+      continue;
+    }
+    if (rule.registrable_domain.empty()) {
+      continue;
+    }
+    result.rules.push_back(std::move(rule));
+  }
+
+  result.valid = true;
+  return result;
 }
 
 }  // namespace
@@ -80,55 +120,33 @@ PlaylistExclusions::PlaylistExclusions() = default;
 
 PlaylistExclusions::~PlaylistExclusions() = default;
 
-void PlaylistExclusions::OnComponentReady(const base::FilePath& component_dir) {
-  component_path_ = component_dir;
+void PlaylistExclusions::LoadPlaylistExclusions(
+    const base::FilePath& exclusions_file_path) {
+  is_ready_ = false;
+  rules_.clear();
 
   base::ThreadPool::PostTaskAndReplyWithResult(
       FROM_HERE,
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
-      base::BindOnce(&brave_component_updater::GetDATFileAsString,
-                     component_path_.AppendASCII(kPlaylistExclusionsJsonFile)),
-      base::BindOnce(&PlaylistExclusions::OnPlaylistExclusionsLoaded,
-                     weak_factory_.GetWeakPtr()));
+      base::BindOnce(&LoadPlaylistExclusionsFromFile, exclusions_file_path),
+      base::BindOnce(
+          [](base::WeakPtr<PlaylistExclusions> exclusions,
+             PlaylistExclusionsLoadResult result) {
+            if (!exclusions) {
+              return;
+            }
+            exclusions->OnPlaylistExclusionsLoaded(std::move(result.rules),
+                                                   result.valid);
+          },
+          weak_factory_.GetWeakPtr()));
 }
 
 void PlaylistExclusions::OnPlaylistExclusionsLoaded(
-    const std::string& contents) {
-  rules_.clear();
-  is_ready_ = false;
-
-  // Bail out if the component file was not loaded.
-  if (contents.empty()) {
-    return;
-  }
-
-  std::optional<base::DictValue> root =
-      base::JSONReader::ReadDict(contents, base::JSON_PARSE_RFC);
-  // Skip malformed JSON payloads.
-  if (!root) {
-    return;
-  }
-
-  const base::ListValue* rules_list = root->FindList(kRules);
-  // Skip payloads without a rules list.
-  if (!rules_list) {
-    return;
-  }
-
-  base::JSONValueConverter<PlaylistResolveRule> converter;
-  for (const base::Value& rule_val : *rules_list) {
-    PlaylistResolveRule rule;
-    if (!converter.Convert(rule_val, &rule)) {
-      continue;
-    }
-    if (rule.registrable_domain.empty()) {
-      continue;
-    }
-    rules_.push_back(std::move(rule));
-  }
-
-  is_ready_ = true;
+    std::vector<PlaylistResolveRule> rules,
+    bool valid) {
+  rules_ = std::move(rules);
+  is_ready_ = valid;
 }
 
 bool PlaylistExclusions::CanResolvePageSrcLater(const GURL& url) const {

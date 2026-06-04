@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-#include "brave/components/playlist/core/browser/playlist_exclusion.h"
+#include "brave/components/playlist/core/browser/playlist_exclusions.h"
 
 #include "base/files/file_util.h"
 #include "base/files/scoped_temp_dir.h"
@@ -26,7 +26,6 @@ class PlaylistExclusionsUnitTest : public testing::Test {
     exclusions->weak_factory_.InvalidateWeakPtrs();
     exclusions->rules_.clear();
     exclusions->is_ready_ = false;
-    exclusions->component_path_.clear();
   }
 
   base::test::TaskEnvironment task_environment_{
@@ -41,19 +40,43 @@ TEST_F(PlaylistExclusionsUnitTest, NotReadyIsPermissive) {
 
 TEST_F(PlaylistExclusionsUnitTest, EmptyContentsNotReady) {
   PlaylistExclusions* exclusions = PlaylistExclusions::GetInstance();
-  exclusions->OnPlaylistExclusionsLoaded("");
+
+  base::ScopedTempDir temp_dir;
+  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
+  const base::FilePath exclusions_file =
+      temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
+  ASSERT_TRUE(base::WriteFile(exclusions_file, ""));
+
+  exclusions->LoadPlaylistExclusions(exclusions_file);
+  task_environment_.RunUntilIdle();
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
 TEST_F(PlaylistExclusionsUnitTest, InvalidJsonNotReady) {
   PlaylistExclusions* exclusions = PlaylistExclusions::GetInstance();
-  exclusions->OnPlaylistExclusionsLoaded("{not valid json");
+
+  base::ScopedTempDir temp_dir;
+  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
+  const base::FilePath exclusions_file =
+      temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
+  ASSERT_TRUE(base::WriteFile(exclusions_file, "{not valid json"));
+
+  exclusions->LoadPlaylistExclusions(exclusions_file);
+  task_environment_.RunUntilIdle();
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
 TEST_F(PlaylistExclusionsUnitTest, MissingRulesListNotReady) {
   PlaylistExclusions* exclusions = PlaylistExclusions::GetInstance();
-  exclusions->OnPlaylistExclusionsLoaded(R"({"version": 1})");
+
+  base::ScopedTempDir temp_dir;
+  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
+  const base::FilePath exclusions_file =
+      temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
+  ASSERT_TRUE(base::WriteFile(exclusions_file, R"({"version": 1})"));
+
+  exclusions->LoadPlaylistExclusions(exclusions_file);
+  task_environment_.RunUntilIdle();
   EXPECT_FALSE(exclusions->is_ready_);
 }
 
@@ -71,10 +94,11 @@ TEST_F(PlaylistExclusionsUnitTest, RulesBlockListedPaths) {
 
   base::ScopedTempDir temp_dir;
   ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
-  ASSERT_TRUE(base::WriteFile(
-      temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile), kJson));
+  const base::FilePath exclusions_file =
+      temp_dir.GetPath().AppendASCII(kPlaylistExclusionsJsonFile);
+  ASSERT_TRUE(base::WriteFile(exclusions_file, kJson));
 
-  exclusions->OnComponentReady(temp_dir.GetPath());
+  exclusions->LoadPlaylistExclusions(exclusions_file);
   ASSERT_TRUE(base::test::RunUntil([&]() { return exclusions->is_ready_; }));
 
   EXPECT_FALSE(
