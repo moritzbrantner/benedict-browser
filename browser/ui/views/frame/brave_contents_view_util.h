@@ -35,6 +35,9 @@ class BraveContentsViewUtil {
   static int GetRoundedCornersWebViewMargin(Browser* browser);
   static int GetRoundedCornersWebViewMargin(const Browser* browser);
 
+  static gfx::RoundedCornersF GetRoundedCornersForPanelView(
+      BrowserWindowInterface* browser_window_interface);
+
   // Pass content's tab to |tab| if it needs to consider split view state.
   static gfx::RoundedCornersF GetRoundedCornersForContentsView(
       BrowserWindowInterface* browser_window_interface,

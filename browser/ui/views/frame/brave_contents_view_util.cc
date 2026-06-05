@@ -64,6 +64,48 @@ int BraveContentsViewUtil::GetRoundedCornersWebViewMargin(
 }
 
 // static
+gfx::RoundedCornersF BraveContentsViewUtil::GetRoundedCornersForPanelView(
+    BrowserWindowInterface* browser_window_interface) {
+  auto* layout_provider = views::LayoutProvider::Get();
+  auto rounded_corners = gfx::RoundedCornersF(
+      layout_provider->GetCornerRadiusMetric(kRoundedCornersBorderRadius));
+
+  auto* browser_view = BraveBrowserView::From(
+      BrowserView::GetBrowserViewForBrowser(browser_window_interface));
+
+  // Can null during the startup.
+  if (!browser_view) {
+    return rounded_corners;
+  }
+
+  // Don't need window corner radius if panel is not the right/left most UI.
+  if (browser_view->IsSidebarVisible()) {
+    return rounded_corners;
+  }
+
+  const bool panel_on_right =
+      browser_window_interface->GetProfile()->GetPrefs()->GetBoolean(
+          prefs::kSidePanelHorizontalAlignment);
+
+  // If panel is on right, panel's lower-right radius should be window-corner
+  // radius if sidebar is visible. If panel is on left, panel's lower-left
+  // radius should be window-corneer radius if sidebar is visible.
+  const auto rounded_corners_border_radius_at_window_corner =
+      layout_provider->GetCornerRadiusMetric(
+          kRoundedCornersBorderRadiusAtWindowCorner);
+
+  if (panel_on_right) {
+    rounded_corners.set_lower_right(
+        rounded_corners_border_radius_at_window_corner);
+  } else {
+    rounded_corners.set_lower_left(
+        rounded_corners_border_radius_at_window_corner);
+  }
+
+  return rounded_corners;
+}
+
+// static
 gfx::RoundedCornersF BraveContentsViewUtil::GetRoundedCornersForContentsView(
     BrowserWindowInterface* browser_window_interface,
     tabs::TabInterface* tab) {
@@ -116,7 +158,9 @@ gfx::RoundedCornersF BraveContentsViewUtil::GetRoundedCornersForContentsView(
     }
   }
 
-  if (browser_view->IsSidebarVisible()) {
+  if (browser_view->IsSidebarVisible() ||
+      (browser_view->side_panel() &&
+       browser_view->side_panel()->GetVisible())) {
     if (browser_window_interface->GetProfile()->GetPrefs()->GetBoolean(
             prefs::kSidePanelHorizontalAlignment)) {
       has_right_side_ui = true;
