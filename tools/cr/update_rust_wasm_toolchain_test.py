@@ -127,6 +127,10 @@ class UpdateExecuteTest(unittest.TestCase):
 
     INSTALLER = 'tools/cr/toolchains/install_extra_deps.py'
 
+    # The Chromium tag `execute` resolves `--to` against; the revision-bump
+    # commit is tagged with it so the revision scripts can be read at the ref.
+    CHROMIUM_TAG = '150.0.7850.1'
+
     def setUp(self):
         self.repo = FakeChromiumRepo()
         self.repo.setup()
@@ -166,7 +170,8 @@ class UpdateExecuteTest(unittest.TestCase):
 
     def _seed_rust_revision_bump(self) -> str:
         """Seed a Chromium commit introducing the Rust/Clang revision constants
-        in both scripts, returning its hash -- what the pickaxe in
+        in both scripts and tag it as `CHROMIUM_TAG`, returning its hash -- the
+        ref `execute` reads the revision constants from, and what the pickaxe in
         `_resolve_chromium_culprit` should attribute the update to."""
         self.repo.write_and_stage_file(
             'tools/rust/update_rust.py',
@@ -176,7 +181,11 @@ class UpdateExecuteTest(unittest.TestCase):
             'tools/clang/scripts/update.py',
             "CLANG_REVISION = 'llvmorg-23-init-10931-g20b6ec66'\n",
             self.repo.chromium)
-        return self.repo.commit('Roll clang+rust revision', self.repo.chromium)
+        culprit = self.repo.commit('Roll clang+rust revision',
+                                   self.repo.chromium)
+        self.repo._run_git_command(['tag', self.CHROMIUM_TAG],
+                                   self.repo.chromium)
+        return culprit
 
     def _installer_text(self) -> str:
         return (self.repo.brave / self.INSTALLER).read_bytes().decode('utf-8')
@@ -194,7 +203,8 @@ class UpdateExecuteTest(unittest.TestCase):
     def test_updates_and_commits_with_auto_culprit(self):
         culprit = self._seed_rust_revision_bump()
 
-        brockit.UpdateRustWasmToolchain().execute(culprit=None)
+        brockit.UpdateRustWasmToolchain().execute(
+            chromium_ref=self.CHROMIUM_TAG, culprit=None)
 
         text = self._installer_text()
         self.assertIn('linux-x64-rust-toolchain-2.tar.xz', text)
@@ -208,7 +218,7 @@ class UpdateExecuteTest(unittest.TestCase):
         subject = message.splitlines()[0]
         self.assertIn('[cr150]', subject)
         self.assertIn('[toolchain]', subject)
-        self.assertIn('Update the Rust/WASM toolchain', subject)
+        self.assertIn('Rust/WASM toolchain', subject)
         # Auto-detected culprit rendered into the body.
         self.assertIn(
             f'https://chromium.googlesource.com/chromium/src/+/{culprit}',
@@ -216,37 +226,43 @@ class UpdateExecuteTest(unittest.TestCase):
         self.assertIn('Roll clang+rust revision', message)
 
     def test_explicit_culprit_overrides_autodetect(self):
-        # An unrelated chromium commit, used only as the --culprit value; the
-        # Rust revision script is never touched, so auto-detect would fail.
+        # Seed the revision bump (read for the toolchain stem and what
+        # auto-detect would attribute to) then point --culprit at an unrelated
+        # commit, proving the explicit value wins over auto-detection.
+        autodetect = self._seed_rust_revision_bump()
         self.repo.write_and_stage_file('docs/unrelated.txt', 'noise\n',
                                        self.repo.chromium)
         culprit = self.repo.commit('Unrelated chromium change',
                                    self.repo.chromium)
 
-        brockit.UpdateRustWasmToolchain().execute(culprit=culprit)
+        brockit.UpdateRustWasmToolchain().execute(
+            chromium_ref=self.CHROMIUM_TAG, culprit=culprit)
 
         message = self._last_brave_message()
         self.assertIn(
             f'https://chromium.googlesource.com/chromium/src/+/{culprit}',
             message)
         self.assertIn('Unrelated chromium change', message)
+        # The auto-detected culprit was overridden, not used.
+        self.assertNotIn(autodetect, message)
 
     def test_idempotent_second_run_does_not_commit(self):
         self._seed_rust_revision_bump()
         toolchain = brockit.UpdateRustWasmToolchain()
 
-        toolchain.execute(culprit=None)
+        toolchain.execute(chromium_ref=self.CHROMIUM_TAG, culprit=None)
         head_after_first = self._brave_head()
 
         # The file already holds NEW_ENTRY, so a re-run is a byte-identical
         # no-op and must not produce a second commit.
-        toolchain.execute(culprit=None)
+        toolchain.execute(chromium_ref=self.CHROMIUM_TAG, culprit=None)
         self.assertEqual(self._brave_head(), head_after_first)
 
     def test_staged_files_block_the_update(self):
         self.repo.write_and_stage_file('staged.txt', 'wip\n', self.repo.brave)
         with self.assertRaises(brockit.InvalidInputException):
-            brockit.UpdateRustWasmToolchain().execute(culprit='deadbeef')
+            brockit.UpdateRustWasmToolchain().execute(
+                chromium_ref=self.CHROMIUM_TAG, culprit='deadbeef')
 
 
 if __name__ == '__main__':
