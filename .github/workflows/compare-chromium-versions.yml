@@ -30,7 +30,7 @@ jobs:
           target_ver="$(chromium_ver "${GITHUB_BASE_REF:?}")"
 
           comment() { gh pr comment "${PR_NUMBER:?}" -R "${GITHUB_REPOSITORY:?}" -b "Chromium major version is behind target branch ($pr_ver vs $target_ver). Please rebase."; }
-          success() { status notice "${1:?}: CI ✅ | Merge ✅"; label remove; }
+          success() { status notice "${1:?}: CI ✅ | Merge ✅"; if has_label; then label remove; fi; }
 
           failure() {
               case "${1:?}" in
@@ -53,3 +53,16 @@ jobs:
           else
               failure blockci "Chromium version mismatch"
           fi
+
+  merge-ready:
+    name: merge-ready
+    if: ${{ always() }}
+    needs: [compare-chromium-versions]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: moritzbrantner/reusable-workflows/.github/actions/merge-ready@b0f25f241d76af2584dfc9e375084ff5c5cb97da
+        with:
+          needs: ${{ toJSON(needs) }}
+          required: '["compare-chromium-versions"]'

@@ -1,8 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["local>brave/renovate-config"],
-  "addLabels": ["CI/skip", "dependencies", "renovate"],
-  "draftPR": true,
+  "extends": [
+    "local>brave/renovate-config",
+    "github>moritzbrantner/coding-agent-conventions"
+  ],
+  "addLabels": [
+    "CI/skip",
+    "dependencies",
+    "renovate"
+  ],
+  "draftPR": false,
   "ignorePaths": [
     "components/**",
     "ios/**",
@@ -10,5 +17,6 @@
     "third_party/**",
     "tools/crates/vendor/**",
     "third_party/wasm/**"
-  ]
+  ],
+  "platformAutomerge": true
 }
