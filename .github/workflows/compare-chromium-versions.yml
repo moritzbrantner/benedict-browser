@@ -30,7 +30,7 @@ jobs:
           target_ver="$(chromium_ver "${GITHUB_BASE_REF:?}")"
 
           comment() { gh pr comment "${PR_NUMBER:?}" -R "${GITHUB_REPOSITORY:?}" -b "Chromium major version is behind target branch ($pr_ver vs $target_ver). Please rebase."; }
-          success() { status notice "${1:?}: CI ✅ | Merge ✅"; label remove; }
+          success() { status notice "${1:?}: CI ✅ | Merge ✅"; if has_label; then label remove; fi; }
 
           failure() {
               case "${1:?}" in
